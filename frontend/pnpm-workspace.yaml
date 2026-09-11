@@ -11,6 +11,7 @@ strictDepBuilds: true
 verifyDepsBeforeRun: error
 enablePrePostScripts: false
 
-# Ningun script de dependencias queda autorizado automaticamente.
-# Revisar los avisos con pnpm why y aprobar solo lo necesario.
-allowBuilds: {}
+# Solo se autoriza el script de esbuild, dependencia necesaria de las herramientas de desarrollo.
+# Cualquier nuevo script de dependencia seguira bloqueado hasta revision manual.
+allowBuilds:
+  esbuild: true

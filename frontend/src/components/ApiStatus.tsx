@@ -10,6 +10,7 @@ const labels: Record<ConnectionState['status'], string> = {
   unavailable: 'Sin conexión',
 };
 
+/** Verifica manualmente el endpoint de salud sin mantener conexiones ni reintentos en segundo plano. */
 export function ApiStatus() {
   const [state, setState] = useState<ConnectionState>({ status: 'idle' });
   const request = useRef<AbortController | null>(null);
@@ -34,25 +35,29 @@ export function ApiStatus() {
   }
 
   return (
-    <section className="surface-card" aria-labelledby="backend-title">
-      <p className="eyebrow">API independiente</p>
-      <h2 id="backend-title">Backend operativo</h2>
-      <p>Fastify + TypeScript. Esta comprobación mantiene validado el enlace local entre ambos proyectos.</p>
-      <p className={`status status--${state.status}`} role="status" aria-live="polite">
-        <span className="status-dot" aria-hidden="true" />
-        {labels[state.status]}
-      </p>
+    <div className="api-status" aria-labelledby="backend-status-title">
+      <div>
+        <p className="eyebrow">API independiente</p>
+        <h3 id="backend-status-title">Backend</h3>
+        <p>Comprueba el endpoint local de salud cuando necesites validar la comunicación.</p>
+      </div>
+      <div className="api-status__controls">
+        <p className={`status status--${state.status}`} role="status" aria-live="polite">
+          <span className="status-dot" aria-hidden="true" />
+          {labels[state.status]}
+        </p>
+        <button
+          className="button button--secondary"
+          type="button"
+          disabled={state.status === 'checking'}
+          onClick={() => { void checkConnection(); }}
+        >
+          {state.status === 'checking' ? 'Comprobando...' : 'Comprobar conexión'}
+        </button>
+      </div>
       {state.status === 'unavailable' && (
-        <p className="help">Verifica que el backend esté iniciado en el puerto 3001.</p>
+        <p className="api-status__help">Verifica que el backend esté iniciado en el puerto 3001.</p>
       )}
-      <button
-        className="button button--primary"
-        type="button"
-        disabled={state.status === 'checking'}
-        onClick={() => { void checkConnection(); }}
-      >
-        {state.status === 'checking' ? 'Comprobando...' : 'Comprobar conexión'}
-      </button>
-    </section>
+    </div>
   );
 }
