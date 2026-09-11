@@ -34,10 +34,10 @@ export function ApiStatus() {
   }
 
   return (
-    <section className="panel" aria-labelledby="backend-title">
+    <section className="surface-card" aria-labelledby="backend-title">
       <p className="eyebrow">API independiente</p>
-      <h2 id="backend-title">Backend</h2>
-      <p>Fastify + TypeScript. El endpoint de salud no requiere Supabase.</p>
+      <h2 id="backend-title">Backend operativo</h2>
+      <p>Fastify + TypeScript. Esta comprobación mantiene validado el enlace local entre ambos proyectos.</p>
       <p className={`status status--${state.status}`} role="status" aria-live="polite">
         <span className="status-dot" aria-hidden="true" />
         {labels[state.status]}
@@ -45,7 +45,12 @@ export function ApiStatus() {
       {state.status === 'unavailable' && (
         <p className="help">Verifica que el backend esté iniciado en el puerto 3001.</p>
       )}
-      <button type="button" disabled={state.status === 'checking'} onClick={() => { void checkConnection(); }}>
+      <button
+        className="button button--primary"
+        type="button"
+        disabled={state.status === 'checking'}
+        onClick={() => { void checkConnection(); }}
+      >
         {state.status === 'checking' ? 'Comprobando...' : 'Comprobar conexión'}
       </button>
     </section>
