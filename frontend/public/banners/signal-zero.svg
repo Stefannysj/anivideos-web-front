@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Torre de radio abstracta sobre montañas nocturnas">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07131c"/>
+      <stop offset="0.55" stop-color="#102b36"/>
+      <stop offset="1" stop-color="#090b10"/>
+    </linearGradient>
+    <radialGradient id="signal" cx="50%" cy="50%" r="50%">
+      <stop offset="0" stop-color="#71d6df" stop-opacity="0.42"/>
+      <stop offset="1" stop-color="#71d6df" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="900" fill="url(#bg)"/>
+  <circle cx="1180" cy="335" r="315" fill="url(#signal)"/>
+  <g fill="none" stroke="#8de8ef" opacity="0.25">
+    <circle cx="1180" cy="335" r="130" stroke-width="4"/>
+    <circle cx="1180" cy="335" r="210" stroke-width="3"/>
+    <circle cx="1180" cy="335" r="292" stroke-width="2"/>
+  </g>
+  <path d="M0 675 200 575 360 640 565 505 740 655 940 540 1135 665 1335 520 1600 640V900H0Z" fill="#0d1820"/>
+  <path d="M0 755 250 665 440 760 700 620 930 755 1165 650 1400 745 1600 680V900H0Z" fill="#080c11"/>
+  <g transform="translate(1170 338)" stroke="#d7fbff" stroke-width="7" stroke-linecap="round" opacity="0.86">
+    <path d="M0 0V328"/>
+    <path d="M-58 328 0 0l58 328"/>
+    <path d="M-42 250h84M-30 180h60M-18 110h36"/>
+  </g>
+  <circle cx="1170" cy="338" r="11" fill="#d7fbff"/>
+  <g fill="#d7fbff" opacity="0.65"><circle cx="930" cy="120" r="3"/><circle cx="1380" cy="120" r="2"/><circle cx="1460" cy="380" r="3"/><circle cx="820" cy="300" r="2"/></g>
+</svg>

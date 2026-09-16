@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="900" viewBox="0 0 1600 900" role="img" aria-label="Horizonte planetario abstracto en tonos rojos y naranjas">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#190b11"/>
+      <stop offset="0.52" stop-color="#4b171d"/>
+      <stop offset="1" stop-color="#0b090b"/>
+    </linearGradient>
+    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffd2a1"/>
+      <stop offset="1" stop-color="#f0674c"/>
+    </linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+  </defs>
+  <rect width="1600" height="900" fill="url(#sky)"/>
+  <ellipse cx="1215" cy="560" rx="355" ry="355" fill="#ee6c4d" opacity="0.23" filter="url(#blur)"/>
+  <circle cx="1215" cy="555" r="245" fill="url(#sun)"/>
+  <path d="M0 630C260 565 455 610 650 675S1080 735 1600 590V900H0Z" fill="#160d10"/>
+  <path d="M0 700C290 625 490 680 720 742S1180 780 1600 690V900H0Z" fill="#09090b"/>
+  <g fill="#ffe4c5" opacity="0.72"><circle cx="1010" cy="135" r="3"/><circle cx="1330" cy="125" r="2"/><circle cx="1480" cy="310" r="3"/><circle cx="900" cy="320" r="2"/></g>
+  <path d="M1090 585 1220 510 1340 585 1220 548Z" fill="#221219" opacity="0.75"/>
+  <path d="M1220 548V645" stroke="#1a0e13" stroke-width="8"/>
+</svg>
