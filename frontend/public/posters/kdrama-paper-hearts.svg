@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="960" viewBox="0 0 720 960" role="img" aria-labelledby="title desc">
+<title id="title">Paper Hearts</title><desc id="desc">Arte promocional abstracto y ficticio creado para AniVideos.</desc>
+<defs>
+  <linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1b1219"/><stop offset="0.55" stop-color="#ff86b8" stop-opacity="0.28"/><stop offset="1" stop-color="#090a0f"/></linearGradient>
+  <radialGradient id="r" cx="70%" cy="20%" r="65%"><stop stop-color="#ffd1e4" stop-opacity="0.48"/><stop offset="1" stop-color="#1b1219" stop-opacity="0"/></radialGradient>
+  <filter id="blur"><feGaussianBlur stdDeviation="22"/></filter>
+</defs>
+<rect width="720" height="960" fill="url(#g)"/>
+<rect width="720" height="960" fill="url(#r)"/>
+<g filter="url(#blur)"><circle cx="597" cy="161" r="59" fill="#ff86b8" opacity="0.068"/><circle cx="544" cy="202" r="72" fill="#ffd1e4" opacity="0.086"/><circle cx="491" cy="243" r="85" fill="#ff86b8" opacity="0.104"/><circle cx="438" cy="284" r="98" fill="#ffd1e4" opacity="0.122"/><circle cx="385" cy="325" r="111" fill="#ff86b8" opacity="0.140"/><circle cx="332" cy="366" r="124" fill="#ffd1e4" opacity="0.158"/></g>
+<path d="M-60 610 C 170 550, 430 655, 790 620" fill="none" stroke="#ffd1e4" stroke-opacity="0.34" stroke-width="3"/>
+<path d="M90 120 L610 120" stroke="#fff" stroke-opacity="0.08"/>
+<path d="M90 840 L630 840" stroke="#fff" stroke-opacity="0.08"/>
+<text x="90" y="170" fill="#fff" fill-opacity="0.58" font-family="Arial,Helvetica,sans-serif" font-size="20" font-weight="700" letter-spacing="7">ANIVIDEOS ORIGINAL</text>
+<text x="88" y="690" fill="#fff" fill-opacity="0.10" font-family="Arial,Helvetica,sans-serif" font-size="88" font-weight="900" letter-spacing="-3">HEARTS</text>
+<text x="90" y="770" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="54" font-weight="800" letter-spacing="-2">Paper Hearts</text>
+<text x="92" y="814" fill="#fff" fill-opacity="0.58" font-family="Arial,Helvetica,sans-serif" font-size="18" letter-spacing="4">FICTIONAL COLLECTION · 2024</text>
+</svg>
