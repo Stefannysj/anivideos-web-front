@@ -882,3 +882,45 @@ summary:focus-visible {
     animation-iteration-count: 1 !important;
   }
 }
+
+
+/* Stage 06: loading and API failure states for SQL-backed home data. */
+.data-state {
+  width: min(100% - 2rem, 1180px);
+  min-height: 56vh;
+  margin: 0 auto;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 1rem;
+  text-align: center;
+}
+
+.data-state--error {
+  max-width: 720px;
+}
+
+.data-state--error h1 {
+  margin: 0;
+}
+
+.data-state--error p {
+  max-width: 620px;
+}
+
+.data-state__spinner {
+  width: 2.25rem;
+  aspect-ratio: 1;
+  border: 3px solid rgba(255, 255, 255, 0.18);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: anivideos-spin 0.8s linear infinite;
+}
+
+@keyframes anivideos-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .data-state__spinner { animation: none; }
+}

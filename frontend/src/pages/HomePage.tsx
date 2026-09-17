@@ -1,15 +1,73 @@
+import { useCallback, useEffect, useState } from 'react';
 import { CatalogLane } from '../components/CatalogLane.js';
 import { FeaturedCarousel } from '../components/FeaturedCarousel.js';
-import { catalog } from '../data/catalog.js';
-import { featuredBanners } from '../data/featured-banners.js';
+import { resolveApiBaseUrl } from '../config/api.js';
+import type { FeaturedBanner } from '../models/banner.js';
+import type { ContentItem } from '../models/content.js';
 import { catalogSections, filterContentByCategory } from '../models/content.js';
+import { getBanners } from '../services/banner.service.js';
+import { getCatalog } from '../services/catalog.service.js';
 
-/** Home de AniVideos con destacados y un catálogo ficticio organizado por categoría. */
+type HomeDataState =
+  | { status: 'loading' }
+  | { status: 'ready'; banners: FeaturedBanner[]; catalog: ContentItem[] }
+  | { status: 'error' };
+
+/** Home backed by the Python API and SQL catalog introduced in stage 06. */
 export function HomePage() {
+  const [state, setState] = useState<HomeDataState>({ status: 'loading' });
+  const [reloadKey, setReloadKey] = useState(0);
+  const retry = useCallback(() => setReloadKey((value) => value + 1), []);
+
+  useEffect(() => {
+    const controller = new AbortController();
+    setState({ status: 'loading' });
+
+    async function loadHome(): Promise<void> {
+      try {
+        const baseUrl = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL, import.meta.env.PROD);
+        const [banners, catalog] = await Promise.all([
+          getBanners(baseUrl, controller.signal),
+          getCatalog(baseUrl, controller.signal),
+        ]);
+        if (!controller.signal.aborted) setState({ status: 'ready', banners, catalog });
+      } catch {
+        if (!controller.signal.aborted) setState({ status: 'error' });
+      }
+    }
+
+    void loadHome();
+    return () => controller.abort();
+  }, [reloadKey]);
+
+  if (state.status === 'loading') {
+    return (
+      <main className="home-page">
+        <section className="data-state" aria-live="polite">
+          <span className="data-state__spinner" aria-hidden="true" />
+          <p>Cargando catálogo desde AniVideos API...</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (state.status === 'error') {
+    return (
+      <main className="home-page">
+        <section className="data-state data-state--error" role="alert">
+          <p className="eyebrow">Conexión requerida</p>
+          <h1>No fue posible cargar AniVideos</h1>
+          <p>Verifica que el backend Python este iniciado en el puerto 3001.</p>
+          <button className="button button--primary" type="button" onClick={retry}>Reintentar</button>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="home-page">
       <div id="inicio" className="home-anchor" aria-hidden="true" />
-      <FeaturedCarousel banners={featuredBanners} />
+      <FeaturedCarousel banners={state.banners} />
 
       <section className="home-overview" aria-labelledby="overview-title">
         <div className="home-overview__heading">
@@ -17,7 +75,7 @@ export function HomePage() {
           <h2 id="overview-title">Encuentra tu próxima historia</h2>
         </div>
         <p>
-          Esta primera versión del catálogo utiliza títulos ficticios y arte local. Las tarjetas ya son reutilizables y están preparadas para conectarse a datos reales en las siguientes etapas.
+          El catálogo y los banners ahora se consultan desde una base SQL mediante la API Python. El arte permanece local en el frontend.
         </p>
       </section>
 
@@ -26,7 +84,7 @@ export function HomePage() {
           <CatalogLane
             key={section.id}
             section={section}
-            items={filterContentByCategory(catalog, section.category)}
+            items={filterContentByCategory(state.catalog, section.category)}
           />
         ))}
       </div>

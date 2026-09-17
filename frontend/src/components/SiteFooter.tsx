@@ -8,7 +8,7 @@ export function SiteFooter() {
       <div className="site-footer__main">
         <Brand compact />
         <p>Anime, K-Dramas, Series y Películas. Plataforma en desarrollo.</p>
-        <span>Etapa 05 · Catálogo y tarjetas</span>
+        <span>Etapa 06 · Python + SQL</span>
       </div>
 
       <details className="technical-panel">
