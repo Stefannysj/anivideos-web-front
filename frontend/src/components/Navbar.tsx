@@ -5,6 +5,7 @@ import { AuthModal } from './AuthModal.js';
 import type { AuthMode } from './AuthModal.js';
 import { Brand } from './Brand.js';
 import { Icon } from './Icon.js';
+import { ProfileModal } from './ProfileModal.js';
 
 /** Cabecera responsive con navegación y acceso a la sesión implementada en la etapa 07. */
 export function Navbar() {
@@ -12,6 +13,7 @@ export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [logoutBusy, setLogoutBusy] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [activeHref, setActiveHref] = useState<string>(() => {
     const currentHash = window.location.hash;
     return navigationItems.some((item) => item.href === currentHash) ? currentHash : '#inicio';
@@ -44,6 +46,7 @@ export function Navbar() {
   function closeMenu(): void { setIsMenuOpen(false); }
   function selectSection(href: string): void { setActiveHref(href); closeMenu(); }
   function openAuth(mode: AuthMode): void { closeMenu(); setAuthMode(mode); }
+  function openProfile(): void { closeMenu(); setProfileOpen(true); }
 
   async function signOut(): Promise<void> {
     setLogoutBusy(true);
@@ -80,7 +83,7 @@ export function Navbar() {
           <div className="navbar__actions">
             {status === 'authenticated' && user ? (
               <div className="navbar__session">
-                <span className="navbar__user"><Icon name="user" size={17} /><span>{user.username}</span></span>
+                <button className="navbar__user" type="button" onClick={openProfile} aria-label="Abrir mi perfil"><Icon name="user" size={17} /><span>{user.displayName || user.username}</span></button>
                 <button className="navbar__logout" type="button" disabled={logoutBusy} onClick={() => void signOut()}>{logoutBusy ? 'Saliendo...' : 'Salir'}</button>
               </div>
             ) : (
@@ -108,7 +111,8 @@ export function Navbar() {
             <div className="mobile-auth">
               {status === 'authenticated' && user ? (
                 <>
-                  <p className="mobile-auth__user">Sesión iniciada como <strong>{user.username}</strong></p>
+                  <p className="mobile-auth__user">Sesión iniciada como <strong>{user.displayName || user.username}</strong></p>
+                  <button className="button button--primary" type="button" onClick={openProfile}>Mi perfil</button>
                   <button className="button button--secondary" type="button" disabled={logoutBusy} onClick={() => void signOut()}>{logoutBusy ? 'Cerrando sesión...' : 'Cerrar sesión'}</button>
                 </>
               ) : (
@@ -124,6 +128,7 @@ export function Navbar() {
       </header>
 
       {authMode && <AuthModal mode={authMode} onModeChange={setAuthMode} onClose={closeAuth} />}
+      {profileOpen && status === 'authenticated' && user && <ProfileModal onClose={() => setProfileOpen(false)} />}
     </>
   );
 }

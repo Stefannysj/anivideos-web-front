@@ -4,7 +4,7 @@ import { parseAuthApiError, parseAuthResponse, validateEmail, validatePassword, 
 
 test('parseAuthResponse accepts a valid backend user', () => {
   const parsed = parseAuthResponse({
-    user: { id: 7, username: 'stefa', email: 'stefa@example.com', avatarUrl: null, createdAt: '2026-09-17T10:00:00Z' },
+    user: { id: 7, username: 'stefa', email: 'stefa@example.com', avatarUrl: null, displayName: null, bio: null, createdAt: '2026-09-17T10:00:00Z', updatedAt: '2026-09-17T10:00:00Z' },
   });
   assert.equal(parsed.user.username, 'stefa');
 });

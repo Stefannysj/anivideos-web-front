@@ -3,7 +3,10 @@ export interface AuthUser {
   username: string;
   email: string;
   avatarUrl: string | null;
+  displayName: string | null;
+  bio: string | null;
   createdAt: string;
+  updatedAt: string;
 }
 
 export interface LoginPayload {
@@ -39,13 +42,28 @@ export function parseAuthResponse(payload: unknown): AuthResponse {
   const username = user.username;
   const email = user.email;
   const rawAvatarUrl = user.avatarUrl;
+  const rawDisplayName = user.displayName;
+  const rawBio = user.bio;
   const createdAt = user.createdAt;
-  if (typeof id !== 'number' || typeof username !== 'string' || typeof email !== 'string' || typeof createdAt !== 'string') {
+  const updatedAt = user.updatedAt;
+  if (typeof id !== 'number' || typeof username !== 'string' || typeof email !== 'string' || typeof createdAt !== 'string' || typeof updatedAt !== 'string') {
     throw new Error('Usuario inválido en respuesta de autenticación.');
   }
-  if (rawAvatarUrl === null) return { user: { id, username, email, avatarUrl: null, createdAt } };
-  if (typeof rawAvatarUrl === 'string') return { user: { id, username, email, avatarUrl: rawAvatarUrl, createdAt } };
-  throw new Error('Usuario inválido en respuesta de autenticación.');
+  if (rawAvatarUrl !== null && typeof rawAvatarUrl !== 'string') throw new Error('Usuario inválido en respuesta de autenticación.');
+  if (rawDisplayName !== null && typeof rawDisplayName !== 'string') throw new Error('Usuario inválido en respuesta de autenticación.');
+  if (rawBio !== null && typeof rawBio !== 'string') throw new Error('Usuario inválido en respuesta de autenticación.');
+  return {
+    user: {
+      id,
+      username,
+      email,
+      avatarUrl: rawAvatarUrl,
+      displayName: rawDisplayName,
+      bio: rawBio,
+      createdAt,
+      updatedAt,
+    },
+  };
 }
 
 export function validateUsername(value: string): string | null {

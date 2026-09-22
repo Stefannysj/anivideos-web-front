@@ -2,7 +2,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import type { PropsWithChildren } from 'react';
 import { resolveApiBaseUrl } from '../config/api.js';
 import type { AuthUser, LoginPayload, RegisterPayload } from '../models/auth.js';
+import type { ProfileUpdatePayload } from '../models/profile.js';
 import { getCurrentUser, login as loginRequest, logout as logoutRequest, register as registerRequest } from '../services/auth.service.js';
+import { updateProfile as updateProfileRequest } from '../services/profile.service.js';
 
 type AuthStatus = 'checking' | 'anonymous' | 'authenticated';
 
@@ -12,6 +14,7 @@ interface AuthContextValue {
   login: (payload: LoginPayload) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (payload: ProfileUpdatePayload) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -54,13 +57,20 @@ export function AuthProvider({ children }: PropsWithChildren) {
     setStatus('authenticated');
   }, [baseUrl]);
 
+
+  const updateProfile = useCallback(async (payload: ProfileUpdatePayload) => {
+    const response = await updateProfileRequest(baseUrl, payload);
+    setUser(response.user);
+    setStatus('authenticated');
+  }, [baseUrl]);
+
   const logout = useCallback(async () => {
     await logoutRequest(baseUrl);
     setUser(null);
     setStatus('anonymous');
   }, [baseUrl]);
 
-  const value = useMemo<AuthContextValue>(() => ({ status, user, login, register, logout }), [status, user, login, register, logout]);
+  const value = useMemo<AuthContextValue>(() => ({ status, user, login, register, logout, updateProfile }), [status, user, login, register, logout, updateProfile]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
