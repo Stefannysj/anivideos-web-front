@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { FeaturedBanner as FeaturedBannerModel } from '../models/banner.js';
 import { wrapBannerIndex } from '../models/banner.js';
+import { BannerCommentsModal } from './BannerCommentsModal.js';
 import { FeaturedBanner } from './FeaturedBanner.js';
 import { Icon } from './Icon.js';
 
@@ -11,6 +12,7 @@ interface FeaturedCarouselProps {
 /** Carrusel manual accesible: evita autoplay y permite navegación por botones, indicadores y teclado. */
 export function FeaturedCarousel({ banners }: FeaturedCarouselProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [commentsBanner, setCommentsBanner] = useState<FeaturedBannerModel | null>(null);
   const carouselRef = useRef<HTMLElement | null>(null);
   const total = banners.length;
 
@@ -19,6 +21,7 @@ export function FeaturedCarousel({ banners }: FeaturedCarouselProps) {
     if (!carousel) return undefined;
 
     function handleKeyDown(event: KeyboardEvent): void {
+      if (commentsBanner) return;
       if (event.key === 'ArrowLeft') {
         event.preventDefault();
         setActiveIndex((current) => wrapBannerIndex(current, -1, total));
@@ -31,7 +34,7 @@ export function FeaturedCarousel({ banners }: FeaturedCarouselProps) {
 
     carousel.addEventListener('keydown', handleKeyDown);
     return () => carousel.removeEventListener('keydown', handleKeyDown);
-  }, [total]);
+  }, [commentsBanner, total]);
 
   const activeBanner = banners[activeIndex];
   if (!activeBanner) throw new Error('AniVideos necesita al menos un banner destacado.');
@@ -53,6 +56,7 @@ export function FeaturedCarousel({ banners }: FeaturedCarouselProps) {
           position={activeIndex + 1}
           total={total}
           key={activeBanner.id}
+          onCommentsOpen={() => setCommentsBanner(activeBanner)}
         />
       </div>
 
@@ -84,6 +88,8 @@ export function FeaturedCarousel({ banners }: FeaturedCarouselProps) {
           </button>
         </div>
       </div>
+
+      {commentsBanner && <BannerCommentsModal banner={commentsBanner} onClose={() => setCommentsBanner(null)} />}
     </section>
   );
 }

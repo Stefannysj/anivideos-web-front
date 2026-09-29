@@ -5,10 +5,11 @@ interface FeaturedBannerProps {
   banner: FeaturedBannerModel;
   position: number;
   total: number;
+  onCommentsOpen: () => void;
 }
 
 /** Presenta un banner editorial sin HTML dinámico; todo el contenido se renderiza como texto de React. */
-export function FeaturedBanner({ banner, position, total }: FeaturedBannerProps) {
+export function FeaturedBanner({ banner, position, total, onCommentsOpen }: FeaturedBannerProps) {
   return (
     <article
       className="featured-banner"
@@ -47,6 +48,10 @@ export function FeaturedBanner({ banner, position, total }: FeaturedBannerProps)
             <Icon name="play" size={18} />
             Explorar {banner.category}
           </a>
+          <button className="button button--glass" type="button" onClick={onCommentsOpen}>
+            <Icon name="message" size={18} />
+            Comentarios
+          </button>
           <button
             className="button button--glass"
             type="button"
