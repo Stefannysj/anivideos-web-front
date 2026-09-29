@@ -1,11 +1,21 @@
+import { useAuth } from '../context/AuthContext.js';
+import { useFavorites } from '../context/FavoritesContext.js';
 import type { ContentItem } from '../models/content.js';
+import { Icon } from './Icon.js';
 
 interface ContentCardProps {
   item: ContentItem;
 }
 
-/** Tarjeta reutilizable del catálogo. Las acciones de detalle y favoritos se incorporarán en etapas posteriores. */
+/** Reusable catalog card with account-backed favorite state. */
 export function ContentCard({ item }: ContentCardProps) {
+  const { status: authStatus } = useAuth();
+  const { isFavorite, isBusy, toggleFavorite } = useFavorites();
+  const favorite = isFavorite(item.id);
+  const busy = isBusy(item.id);
+  const canFavorite = authStatus === 'authenticated';
+  const favoriteLabel = favorite ? `Quitar ${item.title} de Mi lista` : `Agregar ${item.title} a Mi lista`;
+
   return (
     <article className="content-card">
       <div className="content-card__poster">
@@ -25,6 +35,18 @@ export function ContentCard({ item }: ContentCardProps) {
             <span aria-hidden="true">★</span> {item.score.toFixed(1)}
           </span>
         </div>
+
+        <button
+          className={favorite ? 'content-card__favorite content-card__favorite--active' : 'content-card__favorite'}
+          type="button"
+          aria-label={canFavorite ? favoriteLabel : 'Inicia sesión para guardar favoritos'}
+          aria-pressed={canFavorite ? favorite : undefined}
+          title={canFavorite ? favoriteLabel : 'Inicia sesión para guardar este título'}
+          disabled={!canFavorite || busy}
+          onClick={() => void toggleFavorite(item)}
+        >
+          <Icon name="heart" size={18} />
+        </button>
 
         <div className="content-card__overlay">
           <div className="content-card__meta">

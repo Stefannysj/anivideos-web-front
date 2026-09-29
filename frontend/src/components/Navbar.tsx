@@ -7,7 +7,7 @@ import { Brand } from './Brand.js';
 import { Icon } from './Icon.js';
 import { ProfileModal } from './ProfileModal.js';
 
-/** Cabecera responsive con navegación y acceso a la sesión implementada en la etapa 07. */
+/** Responsive header with authenticated profile and favorites navigation. */
 export function Navbar() {
   const { status, user, logout } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -83,6 +83,7 @@ export function Navbar() {
           <div className="navbar__actions">
             {status === 'authenticated' && user ? (
               <div className="navbar__session">
+                <a className="navbar__favorites-link" href="#favoritos" aria-label="Ir a Mi lista"><Icon name="heart" size={16} /><span>Mi lista</span></a>
                 <button className="navbar__user" type="button" onClick={openProfile} aria-label="Abrir mi perfil"><Icon name="user" size={17} /><span>{user.displayName || user.username}</span></button>
                 <button className="navbar__logout" type="button" disabled={logoutBusy} onClick={() => void signOut()}>{logoutBusy ? 'Saliendo...' : 'Salir'}</button>
               </div>
@@ -112,6 +113,7 @@ export function Navbar() {
               {status === 'authenticated' && user ? (
                 <>
                   <p className="mobile-auth__user">Sesión iniciada como <strong>{user.displayName || user.username}</strong></p>
+                  <a className="button button--secondary mobile-auth__favorites" href="#favoritos" onClick={closeMenu}><Icon name="heart" size={17} />Mi lista</a>
                   <button className="button button--primary" type="button" onClick={openProfile}>Mi perfil</button>
                   <button className="button button--secondary" type="button" disabled={logoutBusy} onClick={() => void signOut()}>{logoutBusy ? 'Cerrando sesión...' : 'Cerrar sesión'}</button>
                 </>

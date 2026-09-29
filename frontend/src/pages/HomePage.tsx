@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { CatalogLane } from '../components/CatalogLane.js';
 import { FeaturedCarousel } from '../components/FeaturedCarousel.js';
+import { FavoritesLane } from '../components/FavoritesLane.js';
 import { resolveApiBaseUrl } from '../config/api.js';
 import type { FeaturedBanner } from '../models/banner.js';
 import type { ContentItem } from '../models/content.js';
@@ -13,7 +14,7 @@ type HomeDataState =
   | { status: 'ready'; banners: FeaturedBanner[]; catalog: ContentItem[] }
   | { status: 'error' };
 
-/** Home backed by the Python API and SQL catalog introduced in stage 06. */
+/** Home backed by Python/SQL with account favorites introduced in stage 09. */
 export function HomePage() {
   const [state, setState] = useState<HomeDataState>({ status: 'loading' });
   const [reloadKey, setReloadKey] = useState(0);
@@ -80,6 +81,7 @@ export function HomePage() {
       </section>
 
       <div className="catalog-lanes">
+        <FavoritesLane />
         {catalogSections.map((section) => (
           <CatalogLane
             key={section.id}

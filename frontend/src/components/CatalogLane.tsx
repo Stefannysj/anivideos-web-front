@@ -1,14 +1,21 @@
 import { useRef } from 'react';
-import type { CatalogSection, ContentItem } from '../models/content.js';
+import type { ContentItem } from '../models/content.js';
 import { ContentCard } from './ContentCard.js';
 import { Icon } from './Icon.js';
 
+interface CatalogLaneDefinition {
+  id: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+}
+
 interface CatalogLaneProps {
-  section: CatalogSection;
+  section: CatalogLaneDefinition;
   items: readonly ContentItem[];
 }
 
-/** Carril horizontal accesible para explorar una categoría sin provocar scroll horizontal en la página. */
+/** Accessible horizontal lane reused by normal categories and the authenticated favorites collection. */
 export function CatalogLane({ section, items }: CatalogLaneProps) {
   const trackRef = useRef<HTMLDivElement>(null);
 
