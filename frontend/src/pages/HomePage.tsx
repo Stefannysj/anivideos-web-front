@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { CatalogExplorer } from '../components/CatalogExplorer.js';
 import { CatalogLane } from '../components/CatalogLane.js';
 import { FeaturedCarousel } from '../components/FeaturedCarousel.js';
 import { FavoritesLane } from '../components/FavoritesLane.js';
@@ -14,7 +15,7 @@ type HomeDataState =
   | { status: 'ready'; banners: FeaturedBanner[]; catalog: ContentItem[] }
   | { status: 'error' };
 
-/** Home backed by Python/SQL with account favorites introduced in stage 09. */
+/** Home backed by Python/SQL with server-side catalog search introduced in stage 11. */
 export function HomePage() {
   const [state, setState] = useState<HomeDataState>({ status: 'loading' });
   const [reloadKey, setReloadKey] = useState(0);
@@ -79,6 +80,8 @@ export function HomePage() {
           El catálogo y los banners ahora se consultan desde una base SQL mediante la API Python. El arte permanece local en el frontend.
         </p>
       </section>
+
+      <CatalogExplorer items={state.catalog} />
 
       <div className="catalog-lanes">
         <FavoritesLane />

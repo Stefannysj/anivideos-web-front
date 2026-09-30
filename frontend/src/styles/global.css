@@ -1603,3 +1603,216 @@ summary:focus-visible {
   .comment-composer__footer .button { min-height: 2.65rem; padding-inline: 0.85rem; font-size: 0.72rem; }
   .comment-card__topline { display: grid; gap: 0.25rem; }
 }
+
+/* Stage 11: SQL-backed catalog search and filters. */
+.catalog-explorer {
+  scroll-margin-top: calc(var(--navbar-height) + 1rem);
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 1.4rem;
+  padding: clamp(1.1rem, 2.5vw, 1.65rem);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(169, 139, 255, 0.08), transparent 24rem),
+    rgba(17, 18, 25, 0.82);
+  box-shadow: var(--shadow-soft);
+}
+
+.catalog-explorer__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.catalog-explorer__header > div { display: grid; gap: 0.45rem; }
+.catalog-explorer__header p:last-child { max-width: 48rem; font-size: 0.86rem; }
+.catalog-explorer__total {
+  flex: 0 0 auto;
+  padding: 0.42rem 0.68rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  color: #b7b8c5;
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.72rem;
+  font-weight: 760;
+}
+
+.catalog-filters {
+  display: grid;
+  grid-template-columns: minmax(15rem, 2fr) repeat(5, minmax(8.5rem, 1fr)) auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+.catalog-search {
+  min-height: 3rem;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  padding-inline: 0.8rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 0.85rem;
+  color: #8f909e;
+  background: rgba(7, 8, 12, 0.72);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.catalog-search:focus-within {
+  border-color: rgba(169, 139, 255, 0.62);
+  box-shadow: 0 0 0 3px rgba(169, 139, 255, 0.12);
+}
+
+.catalog-search input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  color: var(--color-text);
+  background: transparent;
+  font: inherit;
+  font-size: 0.84rem;
+}
+.catalog-search input::placeholder { color: #737482; }
+.catalog-search input::-webkit-search-cancel-button { display: none; }
+
+.catalog-search__clear {
+  display: grid;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  place-items: center;
+  border: 0;
+  border-radius: 50%;
+  color: #aaaab6;
+  background: rgba(255, 255, 255, 0.06);
+  cursor: pointer;
+}
+.catalog-search__clear:hover { color: #fff; background: rgba(255, 255, 255, 0.1); }
+
+.catalog-filter-field {
+  min-width: 0;
+  display: grid;
+  gap: 0.38rem;
+  color: #9899a7;
+  font-size: 0.67rem;
+  font-weight: 780;
+}
+
+.catalog-filter-field > span { padding-left: 0.08rem; letter-spacing: 0.02em; }
+.catalog-filter-field select {
+  width: 100%;
+  min-height: 3rem;
+  padding: 0.65rem 2rem 0.65rem 0.7rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  outline: 0;
+  color: #e8e8ef;
+  background: #11121a;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 680;
+}
+.catalog-filter-field select:focus-visible {
+  border-color: rgba(169, 139, 255, 0.62);
+  box-shadow: 0 0 0 3px rgba(169, 139, 255, 0.12);
+}
+
+.catalog-filters__reset {
+  min-height: 3rem;
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.8rem;
+  color: #c4c5cf;
+  background: rgba(255, 255, 255, 0.035);
+  font-size: 0.74rem;
+  font-weight: 750;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.catalog-filters__reset:hover:not(:disabled) { background: rgba(255, 255, 255, 0.075); }
+.catalog-filters__reset:disabled { cursor: not-allowed; opacity: 0.45; }
+
+.catalog-explorer__hint {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border: 1px dashed rgba(255, 255, 255, 0.1);
+  border-radius: 0.85rem;
+  color: #838491;
+  background: rgba(255, 255, 255, 0.018);
+}
+.catalog-explorer__hint p { font-size: 0.78rem; }
+
+.catalog-results {
+  display: grid;
+  gap: 1rem;
+  padding-top: 0.2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.065);
+}
+
+.catalog-results__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-top: 1rem;
+}
+.catalog-results__header > div { display: grid; gap: 0.25rem; }
+.catalog-results__header h3 { font-size: 1.05rem; }
+.catalog-results__loading { color: var(--color-warning); font-size: 0.72rem; font-weight: 720; }
+
+.catalog-results__grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.catalog-results__empty {
+  min-height: 10rem;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 0.55rem;
+  padding: 1.25rem;
+  border: 1px solid var(--color-border);
+  border-radius: 1rem;
+  color: #8d8e9b;
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+}
+.catalog-results__empty p { max-width: 34rem; font-size: 0.8rem; }
+
+@media (max-width: 76rem) {
+  .catalog-filters { grid-template-columns: minmax(15rem, 2fr) repeat(3, minmax(9rem, 1fr)); }
+  .catalog-filters__reset { width: 100%; }
+  .catalog-results__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
+
+@media (max-width: 62rem) {
+  .catalog-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .catalog-search { grid-column: 1 / -1; }
+  .catalog-results__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+@media (max-width: 46rem) {
+  .catalog-explorer__header { align-items: flex-start; flex-direction: column; }
+  .catalog-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .catalog-results__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+
+@media (max-width: 34rem) {
+  .catalog-explorer { padding: 1rem; border-radius: 1.15rem; }
+  .catalog-filters { grid-template-columns: minmax(0, 1fr); }
+  .catalog-search { grid-column: auto; }
+  .catalog-results__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7rem; }
+  .catalog-explorer__total { white-space: normal; }
+}
+
+@media (max-width: 22rem) {
+  .catalog-results__grid { grid-template-columns: minmax(0, 1fr); }
+}

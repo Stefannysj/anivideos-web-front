@@ -1,4 +1,4 @@
-type IconName = 'menu' | 'close' | 'user' | 'heart' | 'message' | 'trash' | 'arrow-right' | 'chevron-left' | 'chevron-right' | 'play' | 'info';
+type IconName = 'search' | 'menu' | 'close' | 'user' | 'heart' | 'message' | 'trash' | 'arrow-right' | 'chevron-left' | 'chevron-right' | 'play' | 'info';
 
 interface IconProps {
   name: IconName;
@@ -20,6 +20,7 @@ export function Icon({ name, size = 20 }: IconProps) {
     focusable: false,
   };
 
+  if (name === 'search') return <svg {...commonProps}><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>;
   if (name === 'menu') return <svg {...commonProps}><path d="M4 7h16M4 12h16M4 17h16" /></svg>;
   if (name === 'close') return <svg {...commonProps}><path d="m6 6 12 12M18 6 6 18" /></svg>;
   if (name === 'user') return <svg {...commonProps}><path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" /></svg>;
