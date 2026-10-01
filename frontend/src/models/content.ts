@@ -13,6 +13,12 @@ export interface ContentItem {
   artwork: `/posters/${string}.svg`;
 }
 
+export interface ContentDetail extends ContentItem {
+  synopsis: string;
+  origin: string;
+  status: string;
+}
+
 export interface CatalogSection {
   id: 'anime' | 'k-dramas' | 'series' | 'peliculas';
   eyebrow: string;
@@ -106,4 +112,27 @@ export function filterContentByCategory(
   category: ContentCategory,
 ): ContentItem[] {
   return items.filter((item) => item.category === category);
+}
+
+
+/** Validates one detailed catalog record returned by the Python API. */
+export function parseContentDetailResponse(value: unknown): ContentDetail {
+  if (!isRecord(value)) throw new Error('El detalle recibido no es valido.');
+
+  const parsed = parseCatalogResponse({ items: [value] })[0];
+  if (!parsed) throw new Error('El detalle recibido no es valido.');
+  if (
+    typeof value.synopsis !== 'string' || value.synopsis.length === 0 || value.synopsis.length > 1200 ||
+    typeof value.origin !== 'string' || value.origin.length === 0 || value.origin.length > 80 ||
+    typeof value.status !== 'string' || value.status.length === 0 || value.status.length > 40
+  ) {
+    throw new Error('El detalle recibido no es valido.');
+  }
+
+  return {
+    ...parsed,
+    synopsis: value.synopsis,
+    origin: value.origin,
+    status: value.status,
+  };
 }

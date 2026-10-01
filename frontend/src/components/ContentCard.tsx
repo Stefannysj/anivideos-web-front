@@ -19,6 +19,11 @@ export function ContentCard({ item }: ContentCardProps) {
   return (
     <article className="content-card">
       <div className="content-card__poster">
+        <a
+          className="content-card__detail-link"
+          href={`/contenido/${item.id}`}
+          aria-label={`Ver detalles de ${item.title}`}
+        />
         <img
           src={item.artwork}
           alt={`Arte promocional ficticio de ${item.title}`}
@@ -61,7 +66,7 @@ export function ContentCard({ item }: ContentCardProps) {
       </div>
 
       <div className="content-card__body">
-        <h3>{item.title}</h3>
+        <h3><a href={`/contenido/${item.id}`}>{item.title}</a></h3>
         <p>{item.genres.join(' · ')}</p>
       </div>
     </article>

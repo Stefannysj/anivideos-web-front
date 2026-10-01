@@ -14,6 +14,7 @@ export function Navbar() {
   const [authMode, setAuthMode] = useState<AuthMode | null>(null);
   const [logoutBusy, setLogoutBusy] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const isHomeRoute = window.location.pathname === '/';
   const [activeHref, setActiveHref] = useState<string>(() => {
     const currentHash = window.location.hash;
     return navigationItems.some((item) => item.href === currentHash) ? currentHash : '#inicio';
@@ -62,7 +63,7 @@ export function Navbar() {
     <>
       <header className="navbar-shell">
         <nav className="navbar" aria-label="Navegación principal">
-          <a className="navbar__brand" href="#inicio" onClick={() => selectSection('#inicio')} aria-label="AniVideos - Ir al inicio">
+          <a className="navbar__brand" href={isHomeRoute ? '#inicio' : '/#inicio'} onClick={() => selectSection('#inicio')} aria-label="AniVideos - Ir al inicio">
             <Brand compact />
           </a>
 
@@ -70,7 +71,7 @@ export function Navbar() {
             {navigationItems.map((item) => (
               <a
                 className={activeHref === item.href ? 'navbar__link navbar__link--active' : 'navbar__link'}
-                href={item.href}
+                href={isHomeRoute ? item.href : `/${item.href}`}
                 key={item.href}
                 aria-current={activeHref === item.href ? 'location' : undefined}
                 onClick={() => selectSection(item.href)}
@@ -83,7 +84,7 @@ export function Navbar() {
           <div className="navbar__actions">
             {status === 'authenticated' && user ? (
               <div className="navbar__session">
-                <a className="navbar__favorites-link" href="#favoritos" aria-label="Ir a Mi lista"><Icon name="heart" size={16} /><span>Mi lista</span></a>
+                <a className="navbar__favorites-link" href={isHomeRoute ? '#favoritos' : '/#favoritos'} aria-label="Ir a Mi lista"><Icon name="heart" size={16} /><span>Mi lista</span></a>
                 <button className="navbar__user" type="button" onClick={openProfile} aria-label="Abrir mi perfil"><Icon name="user" size={17} /><span>{user.displayName || user.username}</span></button>
                 <button className="navbar__logout" type="button" disabled={logoutBusy} onClick={() => void signOut()}>{logoutBusy ? 'Saliendo...' : 'Salir'}</button>
               </div>
@@ -104,7 +105,7 @@ export function Navbar() {
           <div className="mobile-navigation__panel">
             <p className="mobile-navigation__eyebrow">Explorar AniVideos</p>
             {navigationItems.map((item) => (
-              <a className={activeHref === item.href ? 'mobile-navigation__link mobile-navigation__link--active' : 'mobile-navigation__link'} href={item.href} key={item.href} aria-current={activeHref === item.href ? 'location' : undefined} tabIndex={isMenuOpen ? 0 : -1} onClick={() => selectSection(item.href)}>
+              <a className={activeHref === item.href ? 'mobile-navigation__link mobile-navigation__link--active' : 'mobile-navigation__link'} href={isHomeRoute ? item.href : `/${item.href}`} key={item.href} aria-current={activeHref === item.href ? 'location' : undefined} tabIndex={isMenuOpen ? 0 : -1} onClick={() => selectSection(item.href)}>
                 <span>{item.label}</span><Icon name="arrow-right" size={18} />
               </a>
             ))}
@@ -113,7 +114,7 @@ export function Navbar() {
               {status === 'authenticated' && user ? (
                 <>
                   <p className="mobile-auth__user">Sesión iniciada como <strong>{user.displayName || user.username}</strong></p>
-                  <a className="button button--secondary mobile-auth__favorites" href="#favoritos" onClick={closeMenu}><Icon name="heart" size={17} />Mi lista</a>
+                  <a className="button button--secondary mobile-auth__favorites" href={isHomeRoute ? '#favoritos' : '/#favoritos'} onClick={closeMenu}><Icon name="heart" size={17} />Mi lista</a>
                   <button className="button button--primary" type="button" onClick={openProfile}>Mi perfil</button>
                   <button className="button button--secondary" type="button" disabled={logoutBusy} onClick={() => void signOut()}>{logoutBusy ? 'Cerrando sesión...' : 'Cerrar sesión'}</button>
                 </>
