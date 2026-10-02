@@ -2300,3 +2300,19 @@ textarea { touch-action: manipulation; }
     filter: none;
   }
 }
+
+/* Stage 15: defer below-the-fold painting while preserving intrinsic scroll geometry. */
+.catalog-explorer,
+.catalog-lane,
+.site-footer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 42rem;
+}
+
+@media (max-width: 40rem) {
+  .catalog-explorer,
+  .catalog-lane,
+  .site-footer {
+    contain-intrinsic-size: auto 34rem;
+  }
+}

@@ -14,6 +14,7 @@ export async function getHealth(baseUrl: string, signal?: AbortSignal): Promise<
     const response = await apiFetch(`${baseUrl}/health`, {
       method: 'GET',
       credentials: 'omit',
+      cache: 'no-store',
       signal: controller.signal,
     });
     if (!response.ok) throw new Error('No fue posible consultar el backend.');

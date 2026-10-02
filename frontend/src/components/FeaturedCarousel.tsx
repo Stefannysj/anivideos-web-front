@@ -1,9 +1,13 @@
-import { useEffect, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import type { FeaturedBanner as FeaturedBannerModel } from '../models/banner.js';
 import { wrapBannerIndex } from '../models/banner.js';
-import { BannerCommentsModal } from './BannerCommentsModal.js';
 import { FeaturedBanner } from './FeaturedBanner.js';
 import { Icon } from './Icon.js';
+
+const BannerCommentsModal = lazy(async () => {
+  const module = await import('./BannerCommentsModal.js');
+  return { default: module.BannerCommentsModal };
+});
 
 interface FeaturedCarouselProps {
   banners: readonly FeaturedBannerModel[];
@@ -89,7 +93,9 @@ export function FeaturedCarousel({ banners }: FeaturedCarouselProps) {
         </div>
       </div>
 
-      {commentsBanner && <BannerCommentsModal banner={commentsBanner} onClose={() => setCommentsBanner(null)} />}
+      <Suspense fallback={null}>
+        {commentsBanner && <BannerCommentsModal banner={commentsBanner} onClose={() => setCommentsBanner(null)} />}
+      </Suspense>
     </section>
   );
 }

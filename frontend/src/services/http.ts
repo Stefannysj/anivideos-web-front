@@ -16,19 +16,21 @@ export function clearCsrfToken(): void {
   csrfToken = null;
 }
 
-/** Shared fetch policy: no redirects, no cache, bounded credential use, and CSRF on writes. */
+/** Shared fetch policy: safe redirects, bounded credentials, public GET caching, and CSRF on writes. */
 export async function apiFetch(input: string, init: RequestInit = {}): Promise<Response> {
   const method = (init.method ?? 'GET').toUpperCase();
   const headers = new Headers(init.headers);
   if (!headers.has('Accept')) headers.set('Accept', 'application/json');
   if (isUnsafeMethod(method) && csrfToken) headers.set(CSRF_HEADER, csrfToken);
 
+  const credentials = init.credentials ?? 'include';
   const response = await fetch(input, {
     ...init,
     method,
     headers,
-    credentials: init.credentials ?? 'include',
-    cache: 'no-store',
+    credentials,
+    // Public GET metadata can use server ETag/max-age; authenticated traffic remains uncached.
+    cache: init.cache ?? (method === 'GET' && credentials === 'omit' ? 'default' : 'no-store'),
     redirect: 'error',
     referrerPolicy: 'same-origin',
   });

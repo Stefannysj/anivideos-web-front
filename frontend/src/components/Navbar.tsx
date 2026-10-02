@@ -1,11 +1,18 @@
-import { useCallback, useEffect, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.js';
 import { navigationItems } from '../models/navigation.js';
-import { AuthModal } from './AuthModal.js';
 import type { AuthMode } from './AuthModal.js';
 import { Brand } from './Brand.js';
 import { Icon } from './Icon.js';
-import { ProfileModal } from './ProfileModal.js';
+
+const AuthModal = lazy(async () => {
+  const module = await import('./AuthModal.js');
+  return { default: module.AuthModal };
+});
+const ProfileModal = lazy(async () => {
+  const module = await import('./ProfileModal.js');
+  return { default: module.ProfileModal };
+});
 
 /** Responsive header with authenticated profile and favorites navigation. */
 export function Navbar() {
@@ -130,8 +137,10 @@ export function Navbar() {
         </div>
       </header>
 
-      {authMode && <AuthModal mode={authMode} onModeChange={setAuthMode} onClose={closeAuth} />}
-      {profileOpen && status === 'authenticated' && user && <ProfileModal onClose={() => setProfileOpen(false)} />}
+      <Suspense fallback={null}>
+        {authMode && <AuthModal mode={authMode} onModeChange={setAuthMode} onClose={closeAuth} />}
+        {profileOpen && status === 'authenticated' && user && <ProfileModal onClose={() => setProfileOpen(false)} />}
+      </Suspense>
     </>
   );
 }

@@ -63,17 +63,16 @@ export function FavoritesProvider({ children }: PropsWithChildren) {
     await load();
   }, [load]);
 
-  const isFavorite = useCallback(
-    (contentId: string) => items.some((item) => item.id === contentId),
-    [items],
-  );
+  // O(1) favorite membership checks avoid scanning the collection for every visible card render.
+  const favoriteIds = useMemo(() => new Set(items.map((item) => item.id)), [items]);
+  const isFavorite = useCallback((contentId: string) => favoriteIds.has(contentId), [favoriteIds]);
 
   const isBusy = useCallback((contentId: string) => busyIds.has(contentId), [busyIds]);
 
   const toggleFavorite = useCallback(async (item: ContentItem) => {
     if (authStatus !== 'authenticated' || !user || busyIds.has(item.id)) return;
 
-    const wasFavorite = items.some((favorite) => favorite.id === item.id);
+    const wasFavorite = favoriteIds.has(item.id);
     const nextFavorite = !wasFavorite;
     setError(null);
     setBusyIds((current) => new Set(current).add(item.id));
@@ -97,7 +96,7 @@ export function FavoritesProvider({ children }: PropsWithChildren) {
         return next;
       });
     }
-  }, [authStatus, baseUrl, busyIds, items, user]);
+  }, [authStatus, baseUrl, busyIds, favoriteIds, items, user]);
 
   const value = useMemo<FavoritesContextValue>(() => ({
     status,

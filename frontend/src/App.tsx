@@ -1,9 +1,14 @@
+import { lazy, Suspense } from 'react';
 import { AuthProvider } from './context/AuthContext.js';
 import { FavoritesProvider } from './context/FavoritesContext.js';
 import { Navbar } from './components/Navbar.js';
 import { SiteFooter } from './components/SiteFooter.js';
-import { ContentDetailPage } from './pages/ContentDetailPage.js';
 import { HomePage } from './pages/HomePage.js';
+
+const ContentDetailPage = lazy(async () => {
+  const module = await import('./pages/ContentDetailPage.js');
+  return { default: module.ContentDetailPage };
+});
 
 function detailIdFromPath(pathname: string): string | null {
   const match = /^\/contenido\/([a-z0-9-]{1,80})\/?$/.exec(pathname);
@@ -18,7 +23,11 @@ export function App() {
       <FavoritesProvider>
         <div className="app-shell">
           <Navbar />
-          {contentId ? <ContentDetailPage contentId={contentId} /> : <HomePage />}
+          {contentId ? (
+            <Suspense fallback={<main className="content-detail-page"><section className="data-state" aria-live="polite"><span className="data-state__spinner" aria-hidden="true" /><p>Cargando ficha...</p></section></main>}>
+              <ContentDetailPage contentId={contentId} />
+            </Suspense>
+          ) : <HomePage />}
           <SiteFooter />
         </div>
       </FavoritesProvider>

@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { useAuth } from '../context/AuthContext.js';
 import { useFavorites } from '../context/FavoritesContext.js';
 import type { ContentItem } from '../models/content.js';
@@ -8,7 +9,7 @@ interface ContentCardProps {
 }
 
 /** Reusable catalog card with account-backed favorite state. */
-export function ContentCard({ item }: ContentCardProps) {
+export const ContentCard = memo(function ContentCard({ item }: ContentCardProps) {
   const { status: authStatus } = useAuth();
   const { isFavorite, isBusy, toggleFavorite } = useFavorites();
   const favorite = isFavorite(item.id);
@@ -71,4 +72,4 @@ export function ContentCard({ item }: ContentCardProps) {
       </div>
     </article>
   );
-}
+});

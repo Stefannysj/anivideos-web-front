@@ -7,6 +7,7 @@ export async function getBanners(baseUrl: string, signal?: AbortSignal): Promise
   const response = await apiFetch(`${baseUrl}/banners`, {
     method: 'GET',
     credentials: 'omit',
+    cache: 'default',
     signal,
   });
   if (!response.ok) throw new Error('No fue posible cargar los banners.');

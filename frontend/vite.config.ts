@@ -36,5 +36,15 @@ export default defineConfig({
     proxy,
   },
   // Source maps stay out of production output to avoid exposing implementation details.
-  build: { target: 'es2022', sourcemap: false },
+  build: {
+    target: 'es2022',
+    sourcemap: false,
+    cssCodeSplit: true,
+    modulePreload: { polyfill: false },
+    rollupOptions: {
+      output: {
+        manualChunks: { react: ['react', 'react-dom'] },
+      },
+    },
+  },
 });

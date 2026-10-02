@@ -15,6 +15,7 @@ export async function getCatalog(
   const response = await apiFetch(endpoint, {
     method: 'GET',
     credentials: 'omit',
+    cache: 'default',
     signal,
   });
   if (!response.ok) throw new Error('No fue posible cargar el catálogo.');
@@ -34,6 +35,7 @@ export async function getContentDetail(
   const response = await apiFetch(`${baseUrl}/catalog/${encodeURIComponent(contentId)}`, {
     method: 'GET',
     credentials: 'omit',
+    cache: 'default',
     signal,
   });
   if (response.status === 404) throw new Error('Este titulo no existe o ya no esta disponible.');
