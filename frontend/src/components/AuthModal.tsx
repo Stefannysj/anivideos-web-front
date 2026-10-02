@@ -146,7 +146,7 @@ export function AuthModal({ mode, onModeChange, onClose }: AuthModalProps) {
           </button>
         </form>
 
-        <p className="auth-modal__security-note">Sesión mediante cookie HttpOnly. AniVideos no guarda el token de sesión en localStorage.</p>
+        <p className="auth-modal__security-note">Sesión mediante cookie HttpOnly y protección CSRF. AniVideos no guarda el token de sesión en localStorage.</p>
       </section>
     </div>
   );

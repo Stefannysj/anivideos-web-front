@@ -1,6 +1,7 @@
 import { parseAuthApiError, parseAuthResponse } from '../models/auth.js';
 import type { AuthApiError, AuthResponse } from '../models/auth.js';
 import type { ProfileUpdatePayload } from '../models/profile.js';
+import { apiFetch, readJson } from './http.js';
 
 export class ProfileRequestError extends Error {
   readonly details: AuthApiError;
@@ -13,17 +14,15 @@ export class ProfileRequestError extends Error {
 }
 
 export async function updateProfile(baseUrl: string, payload: ProfileUpdatePayload): Promise<AuthResponse> {
-  const response = await fetch(`${baseUrl}/profile`, {
+  const response = await apiFetch(`${baseUrl}/profile`, {
     method: 'PATCH',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(payload),
-    credentials: 'include',
-    cache: 'no-store',
   });
-  const data: unknown = await response.json().catch(() => null);
+  const data: unknown = await readJson(response).catch(() => null);
   if (!response.ok) {
     throw new ProfileRequestError(parseAuthApiError(data, 'No fue posible actualizar el perfil.'));
   }

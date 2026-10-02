@@ -1,5 +1,6 @@
 import { parseAuthApiError, parseAuthResponse } from '../models/auth.js';
 import type { AuthApiError, AuthResponse, LoginPayload, RegisterPayload } from '../models/auth.js';
+import { apiFetch, clearCsrfToken, readJson } from './http.js';
 
 export class AuthRequestError extends Error {
   readonly details: AuthApiError;
@@ -17,17 +18,15 @@ async function authRequest(
   init: RequestInit,
   fallback: string,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${baseUrl}${path}`, {
+  const response = await apiFetch(`${baseUrl}${path}`, {
     ...init,
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       ...(init.headers ?? {}),
     },
-    credentials: 'include',
-    cache: 'no-store',
   });
-  const payload: unknown = await response.json().catch(() => null);
+  const payload: unknown = await readJson(response).catch(() => null);
   if (!response.ok) throw new AuthRequestError(parseAuthApiError(payload, fallback));
   return parseAuthResponse(payload);
 }
@@ -41,28 +40,25 @@ export function login(baseUrl: string, payload: LoginPayload): Promise<AuthRespo
 }
 
 export async function getCurrentUser(baseUrl: string, signal?: AbortSignal): Promise<AuthResponse | null> {
-  const response = await fetch(`${baseUrl}/auth/me`, {
+  const response = await apiFetch(`${baseUrl}/auth/me`, {
     method: 'GET',
-    headers: { Accept: 'application/json' },
-    credentials: 'include',
-    cache: 'no-store',
     signal,
   });
-  if (response.status === 401) return null;
-  const payload: unknown = await response.json().catch(() => null);
+  if (response.status === 401) {
+    clearCsrfToken();
+    return null;
+  }
+  const payload: unknown = await readJson(response).catch(() => null);
   if (!response.ok) throw new AuthRequestError(parseAuthApiError(payload, 'No fue posible verificar la sesión.'));
   return parseAuthResponse(payload);
 }
 
 export async function logout(baseUrl: string): Promise<void> {
-  const response = await fetch(`${baseUrl}/auth/logout`, {
-    method: 'POST',
-    headers: { Accept: 'application/json' },
-    credentials: 'include',
-    cache: 'no-store',
-  });
+  const response = await apiFetch(`${baseUrl}/auth/logout`, { method: 'POST' });
   if (!response.ok) {
-    const payload: unknown = await response.json().catch(() => null);
+    const payload: unknown = await readJson(response).catch(() => null);
+    if (response.status === 401) clearCsrfToken();
     throw new AuthRequestError(parseAuthApiError(payload, 'No fue posible cerrar la sesión.'));
   }
+  clearCsrfToken();
 }

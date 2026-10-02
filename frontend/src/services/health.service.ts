@@ -1,7 +1,8 @@
 import { parseHealthResponse } from '../models/health.js';
 import type { HealthResponse } from '../models/health.js';
+import { apiFetch, readJson } from './http.js';
 
-/** Comprueba la API con tiempo limite y cancelacion al desmontar la interfaz. */
+/** Checks the public health endpoint with a deadline and without session credentials. */
 export async function getHealth(baseUrl: string, signal?: AbortSignal): Promise<HealthResponse> {
   const controller = new AbortController();
   const cancel = (): void => controller.abort();
@@ -10,15 +11,13 @@ export async function getHealth(baseUrl: string, signal?: AbortSignal): Promise<
   const timeout = setTimeout(cancel, 8_000);
 
   try {
-    const response = await fetch(`${baseUrl}/health`, {
+    const response = await apiFetch(`${baseUrl}/health`, {
       method: 'GET',
-      headers: { Accept: 'application/json' },
       credentials: 'omit',
-      cache: 'no-store',
       signal: controller.signal,
     });
     if (!response.ok) throw new Error('No fue posible consultar el backend.');
-    const payload: unknown = await response.json();
+    const payload: unknown = await readJson(response);
     return parseHealthResponse(payload);
   } finally {
     clearTimeout(timeout);
