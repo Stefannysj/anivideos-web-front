@@ -1,0 +1,82 @@
+/* v17: discovery, personal library, recommendations, reviews and calendar. */
+.v17-search-wrap { position: relative; min-width: 0; }
+.v17-suggestions {
+  position: absolute; z-index: 30; top: calc(100% + .45rem); right: 0; left: 0;
+  overflow: hidden; max-height: 26rem; overflow-y: auto;
+  border: 1px solid var(--color-border-strong); border-radius: .9rem;
+  background: rgba(13, 14, 20, .98); box-shadow: var(--shadow-strong);
+}
+.v17-suggestions > p { padding: .9rem 1rem; color: #9293a0; font-size: .78rem; }
+.v17-suggestions button {
+  width: 100%; min-height: 4.25rem; display: grid; grid-template-columns: 2.75rem minmax(0,1fr);
+  align-items: center; gap: .75rem; padding: .55rem .7rem; border: 0; border-bottom: 1px solid rgba(255,255,255,.06);
+  color: var(--color-text); background: transparent; text-align: left; cursor: pointer;
+}
+.v17-suggestions button:hover, .v17-suggestions button:focus-visible { background: rgba(169,139,255,.1); outline: 0; }
+.v17-suggestions img { width: 2.75rem; height: 3.7rem; object-fit: cover; border-radius: .4rem; }
+.v17-suggestions span { display: grid; gap: .18rem; }
+.v17-suggestions strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .82rem; }
+.v17-suggestions small { color: #8d8e9b; font-size: .68rem; }
+
+.v17-library, .v17-recommendations, .v17-reviews, .v17-calendar > section {
+  display: grid; gap: 1rem; margin-top: 1.4rem; padding: clamp(1rem,2.5vw,1.5rem);
+  border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: rgba(17,18,25,.82);
+}
+.v17-library__header { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+.v17-library__header > div:first-child { display: grid; gap: .35rem; }
+.v17-library__tabs { display: flex; flex-wrap: wrap; gap: .45rem; }
+.v17-library__tabs button {
+  min-height: 2.45rem; padding: .45rem .75rem; border: 1px solid var(--color-border); border-radius: 999px;
+  color: #b7b8c5; background: rgba(255,255,255,.03); font: inherit; font-size: .72rem; font-weight: 760; cursor: pointer;
+}
+.v17-library__tabs button.is-active { border-color: rgba(169,139,255,.55); color: #fff; background: rgba(169,139,255,.14); }
+
+.v17-progress { min-width: 12rem; display: grid; gap: .35rem; color: #aaaab7; font-size: .7rem; font-weight: 760; }
+.v17-progress select { min-height: 2.8rem; padding: .55rem .7rem; border: 1px solid var(--color-border); border-radius: .75rem; color: #fff; background: #11121a; }
+
+.v17-reviews { width: 100%; margin-inline: auto; }
+.v17-reviews__heading { display: flex; align-items: end; justify-content: space-between; gap: 1rem; }
+.v17-reviews__heading > div { display: grid; gap: .3rem; }
+.v17-review-form { display: grid; grid-template-columns: minmax(8rem, .35fr) minmax(0, 1fr); gap: .8rem; }
+.v17-review-form label { display: grid; gap: .35rem; color: #aaaab7; font-size: .72rem; font-weight: 760; }
+.v17-review-form select, .v17-review-form textarea {
+  width: 100%; border: 1px solid var(--color-border); border-radius: .8rem; color: var(--color-text); background: #101118; font: inherit;
+}
+.v17-review-form select { min-height: 2.8rem; padding: .6rem .7rem; }
+.v17-review-form textarea { min-height: 7rem; resize: vertical; padding: .75rem; line-height: 1.55; }
+.v17-review-form > div { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: .6rem; }
+.v17-review-list { display: grid; gap: .7rem; }
+.v17-review-card { display: grid; gap: .55rem; padding: .9rem; border: 1px solid var(--color-border); border-radius: .85rem; background: rgba(255,255,255,.02); }
+.v17-review-card header { display: flex; justify-content: space-between; gap: .8rem; }
+.v17-review-card p { white-space: pre-wrap; color: #c7c8d1; line-height: 1.55; }
+.v17-review-card button { justify-self: start; padding: 0; border: 0; color: #b8a7ff; background: transparent; cursor: pointer; font: inherit; font-size: .72rem; font-weight: 760; }
+.v17-review-message { color: #b9e8c0; font-size: .76rem; }
+
+.v17-calendar { display: grid; gap: 1.25rem; }
+.v17-calendar > header { display: grid; gap: .5rem; margin-top: 1.5rem; }
+.v17-calendar > header h1 { font-size: clamp(2rem,5vw,4rem); letter-spacing: -.04em; }
+.v17-calendar-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: .7rem; }
+.v17-calendar-list article { border: 1px solid var(--color-border); border-radius: .8rem; overflow: hidden; background: rgba(255,255,255,.025); }
+.v17-calendar-list a { display: grid; grid-template-columns: 4rem minmax(0,1fr); align-items: center; gap: .75rem; padding: .55rem; color: inherit; text-decoration: none; }
+.v17-calendar-list img { width: 4rem; aspect-ratio: 2/3; object-fit: cover; border-radius: .45rem; }
+.v17-calendar-list span { display: grid; gap: .2rem; }
+.v17-calendar-list small { color: #9394a1; }
+.v17-calendar-controls { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; }
+.v17-calendar-controls h2 { margin-right: auto; }
+.v17-calendar-controls select, .v17-calendar-controls input { min-height: 2.65rem; padding: .5rem .7rem; border: 1px solid var(--color-border); border-radius: .7rem; color: #fff; background: #11121a; }
+.v17-empty { padding: 1rem; color: #8f909d; border: 1px dashed var(--color-border); border-radius: .8rem; }
+
+@media (max-width: 46rem) {
+  .v17-library__header, .v17-reviews__heading { align-items: flex-start; flex-direction: column; }
+  .v17-library__tabs { width: 100%; }
+  .v17-library__tabs button { flex: 1 1 calc(50% - .45rem); min-height: 2.75rem; }
+  .v17-review-form { grid-template-columns: minmax(0,1fr); }
+  .v17-review-form > div { grid-column: auto; }
+  .v17-review-form select, .v17-review-form textarea, .v17-progress select { font-size: 1rem; }
+  .v17-calendar-list { grid-template-columns: minmax(0,1fr); }
+}
+.v17-report-form { display: grid; grid-template-columns: minmax(8rem,.35fr) minmax(0,1fr) auto; gap: .6rem; align-items: end; padding-top: .3rem; }
+.v17-report-form label { display: grid; gap: .3rem; color: #aaaab7; font-size: .7rem; font-weight: 760; }
+.v17-report-form select, .v17-report-form textarea { width: 100%; min-height: 2.6rem; padding: .5rem .6rem; border: 1px solid var(--color-border); border-radius: .7rem; color: var(--color-text); background: #101118; font: inherit; }
+.v17-report-form textarea { min-height: 4rem; resize: vertical; }
+@media (max-width: 46rem) { .v17-report-form { grid-template-columns: minmax(0,1fr); } .v17-report-form select, .v17-report-form textarea { font-size: 1rem; } }

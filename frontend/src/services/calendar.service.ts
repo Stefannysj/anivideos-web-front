@@ -1,0 +1,5 @@
+import { parseSeasonCalendar, parseWeeklyCalendar } from '../models/calendar.js';
+import type { SeasonCalendar, SeasonName, WeeklyCalendar } from '../models/calendar.js';
+import { apiFetch, readJson } from './http.js';
+export async function getWeeklyCalendar(baseUrl:string,weekStart?:string,signal?:AbortSignal):Promise<WeeklyCalendar>{const params=new URLSearchParams();if(weekStart)params.set('weekStart',weekStart);const response=await apiFetch(`${baseUrl}/calendar/week${params.size?`?${params}`:''}`,{method:'GET',credentials:'omit',signal});if(!response.ok)throw new Error('Calendar request failed');return parseWeeklyCalendar(await readJson(response));}
+export async function getSeasonCalendar(baseUrl:string,season:SeasonName,year:number,signal?:AbortSignal):Promise<SeasonCalendar>{const params=new URLSearchParams({season,year:String(year)});const response=await apiFetch(`${baseUrl}/calendar/season?${params}`,{method:'GET',credentials:'omit',signal});if(!response.ok)throw new Error('Season request failed');return parseSeasonCalendar(await readJson(response));}

@@ -37,6 +37,10 @@ export interface ContentDetail extends ContentItem {
   officialUrl: string | null;
   platformLinks: readonly PlatformLink[];
   sourceUrl: string | null;
+  season: string | null;
+  seasonYear: number | null;
+  nextAiringAt: string | null;
+  nextEpisodeNumber: number | null;
 }
 
 export interface CatalogSection {
@@ -143,6 +147,10 @@ export function parseContentDetailResponse(value: unknown): ContentDetail {
     officialUrl: allowedHttpsUrl(value.officialUrl) ? value.officialUrl : null,
     platformLinks: parsePlatformLinks(value.platformLinks),
     sourceUrl: allowedHttpsUrl(value.sourceUrl) ? value.sourceUrl : null,
+    season: typeof value.season === 'string' ? value.season : null,
+    seasonYear: typeof value.seasonYear === 'number' ? value.seasonYear : null,
+    nextAiringAt: typeof value.nextAiringAt === 'string' ? value.nextAiringAt : null,
+    nextEpisodeNumber: typeof value.nextEpisodeNumber === 'number' ? value.nextEpisodeNumber : null,
   };
 }
 

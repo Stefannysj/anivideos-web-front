@@ -1,5 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext.js';
+import { t } from '../i18n/i18n.js';
 import { navigationItems } from '../models/navigation.js';
 import type { AuthMode } from './AuthModal.js';
 import { Brand } from './Brand.js';
@@ -86,6 +87,7 @@ export function Navbar() {
                 {item.label}
               </a>
             ))}
+            <a className={window.location.pathname==='/calendario'?'navbar__link navbar__link--active':'navbar__link'} href="/calendario">{t('calendar.nav')}</a>
           </div>
 
           <div className="navbar__actions">
@@ -116,6 +118,7 @@ export function Navbar() {
                 <span>{item.label}</span><Icon name="arrow-right" size={18} />
               </a>
             ))}
+            <a className="mobile-navigation__link" href="/calendario" tabIndex={isMenuOpen ? 0 : -1} onClick={closeMenu}><span>{t('calendar.nav')}</span><Icon name="arrow-right" size={18}/></a>
 
             <div className="mobile-auth">
               {status === 'authenticated' && user ? (
