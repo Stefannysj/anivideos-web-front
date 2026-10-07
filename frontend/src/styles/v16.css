@@ -1,0 +1,70 @@
+/* v16: real catalog, editorial pages and legal surface. */
+.v16-page {
+  width: min(calc(100% - 2rem), var(--container));
+  min-height: 60vh;
+  margin-inline: auto;
+  padding: clamp(2rem, 5vw, 4.5rem) 0;
+}
+.v16-page__hero,
+.v16-article > header,
+.v16-legal > header { display: grid; gap: .7rem; margin-bottom: 2rem; }
+.v16-page h1 { max-width: 18ch; color: #fff; font-size: clamp(2.2rem, 6vw, 4.8rem); line-height: .98; letter-spacing: -.045em; }
+.v16-page p { max-width: 72ch; line-height: 1.75; }
+.v16-blog-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.v16-blog-card { display: grid; gap: .85rem; padding: clamp(1rem, 3vw, 1.5rem); border: 1px solid var(--color-border); border-radius: 1.2rem; background: rgba(17,18,25,.82); }
+.v16-blog-card > span { color: #8e8f9e; font-size: .7rem; text-transform: uppercase; letter-spacing: .08em; }
+.v16-blog-card h2 { color: #fff; font-size: clamp(1.2rem, 3vw, 1.7rem); }
+.v16-blog-card .button { justify-self: start; }
+.v16-article { max-width: 62rem; }
+.v16-article > a { display: inline-block; margin-bottom: 1.5rem; }
+.v16-markdown { display: grid; gap: 1rem; }
+.v16-markdown h2 { margin-top: 1.4rem; color: #fff; font-size: 1.6rem; }
+.v16-markdown h3 { margin-top: 1rem; color: #fff; font-size: 1.25rem; }
+.v16-markdown ul { display: grid; gap: .55rem; padding-left: 1.3rem; color: #c9cad4; }
+.v16-markdown a { color: #cabbff; text-decoration: underline; text-underline-offset: .18em; }
+.v16-legal { max-width: 62rem; }
+.v16-legal > p { margin-bottom: 1rem; color: #c9cad4; }
+.v16-legal__draft { padding: .85rem 1rem; border: 1px solid rgba(242,213,139,.25); border-radius: .8rem; color: #e4d7ac; background: rgba(242,213,139,.06); }
+.v16-footer-links { display: flex; flex-wrap: wrap; gap: .75rem 1rem; }
+.v16-footer-links a { color: #c4c5cf; font-size: .78rem; }
+.v16-credits { display: grid; gap: .35rem; color: #777886; font-size: .7rem; line-height: 1.5; }
+.v16-credits a { color: #a9aaba; }
+.v16-trailer { display: grid; gap: .75rem; }
+.v16-trailer h2,.v16-platforms h2 { color: #fff; font-size: 1rem; }
+.v16-trailer iframe { width: 100%; aspect-ratio: 16 / 9; border: 0; border-radius: 1rem; background: #000; }
+.v16-platforms { display: grid; gap: .75rem; }
+.v16-platform-links { display: flex; flex-wrap: wrap; gap: .55rem; }
+.v16-platform-links a { padding: .5rem .7rem; border: 1px solid var(--color-border); border-radius: 999px; color: #e8e8ef; background: rgba(255,255,255,.035); font-size: .74rem; font-weight: 720; }
+.v16-platforms > p { color: #777886; font-size: .7rem; line-height: 1.5; }
+.v16-catalog-filters { grid-template-columns: minmax(15rem,2fr) repeat(7,minmax(7.6rem,1fr)) auto; }
+@media (max-width: 90rem) { .v16-catalog-filters { grid-template-columns: repeat(4,minmax(0,1fr)); } .v16-catalog-filters .catalog-search { grid-column: 1 / -1; } }
+@media (max-width: 46rem) { .v16-blog-grid { grid-template-columns: 1fr; } .v16-catalog-filters { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media (max-width: 34rem) { .v16-page { width: calc(100% - 1.25rem); } .v16-catalog-filters { grid-template-columns: 1fr; } .v16-catalog-filters .catalog-search { grid-column: auto; } }
+
+
+/* v16 development-only AniList diagnostic. It never replaces the PostgreSQL catalog. */
+.anilist-dev__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .65rem; margin-top: .25rem; }
+.anilist-dev {
+  width: min(100%, 72rem);
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem auto 0;
+  padding: clamp(1rem, 3vw, 1.5rem);
+  border: 1px dashed rgba(169,139,255,.34);
+  border-radius: 1.15rem;
+  background: rgba(169,139,255,.045);
+}
+.anilist-dev__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+.anilist-dev__header > div { display: grid; gap: .35rem; }
+.anilist-dev__header p:last-child { max-width: 58rem; color: #9899a7; font-size: .78rem; line-height: 1.55; }
+.anilist-dev__header > a { color: #cabbff; font-size: .78rem; font-weight: 760; }
+.anilist-dev__state { color: #b9bac6; }
+.anilist-dev__grid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .8rem; }
+.anilist-dev__card { overflow: hidden; border: 1px solid var(--color-border); border-radius: .9rem; background: rgba(8,9,13,.72); }
+.anilist-dev__card img { width: 100%; aspect-ratio: 230 / 325; object-fit: cover; background: #11121a; }
+.anilist-dev__card > div { display: grid; gap: .35rem; padding: .75rem; }
+.anilist-dev__card h2 { color: #fff; font-size: .9rem; line-height: 1.3; }
+.anilist-dev__card p { color: #8f909e; font-size: .68rem; line-height: 1.45; }
+.anilist-dev__card a { color: #cabbff; font-size: .7rem; font-weight: 760; }
+@media (max-width: 52rem) { .anilist-dev__grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
+@media (max-width: 36rem) { .anilist-dev__header { flex-direction: column; } .anilist-dev__grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }

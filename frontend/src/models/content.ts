@@ -1,138 +1,151 @@
-export type ContentCategory = 'anime' | 'k-drama' | 'series' | 'movie';
+import type { TranslationKey } from '../i18n/translations.js';
+
+export type ContentCategory = 'anime' | 'k-drama' | 'j-drama' | 'donghua' | 'movie' | 'ova';
+export type ContentSource = 'anilist' | 'tmdb';
+
+export interface PlatformLink {
+  name: string;
+  url: string;
+  attribution?: string | null;
+}
 
 export interface ContentItem {
   id: string;
+  source: ContentSource;
+  sourceAttribution: string;
+  externalId: string;
   title: string;
+  originalTitle: string | null;
   category: ContentCategory;
   categoryLabel: string;
-  year: number;
+  year: number | null;
   score: number;
   maturity: string;
   format: string;
   genres: readonly string[];
-  artwork: `/posters/${string}.svg`;
+  artwork: string;
+  studio: string | null;
+  episodes: number | null;
+  status: string;
 }
 
 export interface ContentDetail extends ContentItem {
   synopsis: string;
   origin: string;
-  status: string;
+  backdropUrl: string | null;
+  trailerYoutubeId: string | null;
+  officialUrl: string | null;
+  platformLinks: readonly PlatformLink[];
+  sourceUrl: string | null;
 }
 
 export interface CatalogSection {
-  id: 'anime' | 'k-dramas' | 'series' | 'peliculas';
-  eyebrow: string;
-  title: string;
-  description: string;
+  id: 'anime' | 'k-dramas' | 'j-dramas' | 'donghua' | 'peliculas' | 'ovas';
+  labelKey: TranslationKey;
   category: ContentCategory;
 }
 
 export const catalogSections = [
-  {
-    id: 'anime',
-    eyebrow: 'Animación japonesa',
-    title: 'Anime',
-    description: 'Aventura, fantasía, ciencia ficción y nuevas historias por descubrir.',
-    category: 'anime',
-  },
-  {
-    id: 'k-dramas',
-    eyebrow: 'Historias de Corea',
-    title: 'K-Dramas',
-    description: 'Romance, thriller, comedia y dramas contemporaneos en una sola colección.',
-    category: 'k-drama',
-  },
-  {
-    id: 'series',
-    eyebrow: 'Para maratonear',
-    title: 'Series',
-    description: 'Temporadas y producciones episódicas organizadas para explorar con rapidez.',
-    category: 'series',
-  },
-  {
-    id: 'peliculas',
-    eyebrow: 'Pantalla grande',
-    title: 'Películas',
-    description: 'Historias completas de distintos géneros preparadas para el futuro catálogo.',
-    category: 'movie',
-  },
+  { id: 'anime', labelKey: 'category.anime', category: 'anime' },
+  { id: 'k-dramas', labelKey: 'category.k-drama', category: 'k-drama' },
+  { id: 'j-dramas', labelKey: 'category.j-drama', category: 'j-drama' },
+  { id: 'donghua', labelKey: 'category.donghua', category: 'donghua' },
+  { id: 'peliculas', labelKey: 'category.movie', category: 'movie' },
+  { id: 'ovas', labelKey: 'category.ova', category: 'ova' },
 ] as const satisfies readonly CatalogSection[];
 
-const categories = new Set<ContentCategory>(['anime', 'k-drama', 'series', 'movie']);
+const categories = new Set<ContentCategory>(['anime', 'k-drama', 'j-drama', 'donghua', 'movie', 'ova']);
+const sources = new Set<ContentSource>(['anilist', 'tmdb']);
+const allowedArtworkHosts = new Set(['s4.anilist.co', 's3.anilist.co', 'image.tmdb.org']);
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
 }
 
-/** Validates catalog data received from the Python API before rendering it. */
-export function parseCatalogResponse(value: unknown): ContentItem[] {
-  if (!isRecord(value) || !Array.isArray(value.items)) {
-    throw new Error('El catálogo recibido no es válido.');
+function allowedHttpsUrl(value: unknown, hosts?: Set<string>): value is string {
+  if (typeof value !== 'string') return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'https:' && (!hosts || hosts.has(url.hostname));
+  } catch {
+    return false;
   }
+}
 
+function parsePlatformLinks(value: unknown): PlatformLink[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    if (!isRecord(item) || typeof item.name !== 'string' || !allowedHttpsUrl(item.url)) return [];
+    return [{
+      name: item.name,
+      url: item.url,
+      attribution: typeof item.attribution === 'string' ? item.attribution : null,
+    }];
+  });
+}
+
+export function parseCatalogResponse(value: unknown): ContentItem[] {
+  if (!isRecord(value) || !Array.isArray(value.items)) throw new Error('El catálogo recibido no es válido.');
   return value.items.map((item): ContentItem => {
     if (!isRecord(item)) throw new Error('Elemento de catálogo inválido.');
-
-    const category = item.category;
-    const artwork = item.artwork;
-    const genres = item.genres;
     if (
-      typeof item.id !== 'string' || item.id.length === 0 ||
+      typeof item.id !== 'string' || !/^[a-z0-9-]{1,120}$/.test(item.id) ||
+      typeof item.source !== 'string' || !sources.has(item.source as ContentSource) ||
+      typeof item.sourceAttribution !== 'string' || typeof item.externalId !== 'string' ||
       typeof item.title !== 'string' || item.title.length === 0 ||
-      typeof category !== 'string' || !categories.has(category as ContentCategory) ||
+      !(item.originalTitle === null || typeof item.originalTitle === 'string') ||
+      typeof item.category !== 'string' || !categories.has(item.category as ContentCategory) ||
       typeof item.categoryLabel !== 'string' ||
-      typeof item.year !== 'number' || !Number.isInteger(item.year) ||
+      !(item.year === null || (typeof item.year === 'number' && Number.isInteger(item.year))) ||
       typeof item.score !== 'number' || item.score < 0 || item.score > 10 ||
-      typeof item.maturity !== 'string' ||
-      typeof item.format !== 'string' ||
-      !Array.isArray(genres) || !genres.every((genre) => typeof genre === 'string') ||
-      typeof artwork !== 'string' || !/^\/posters\/[a-z0-9-]+\.svg$/.test(artwork)
-    ) {
-      throw new Error('Elemento de catálogo inválido.');
-    }
+      typeof item.maturity !== 'string' || typeof item.format !== 'string' ||
+      !Array.isArray(item.genres) || !item.genres.every((genre) => typeof genre === 'string') ||
+      !allowedHttpsUrl(item.artwork, allowedArtworkHosts) ||
+      !(item.studio === null || typeof item.studio === 'string') ||
+      !(item.episodes === null || (typeof item.episodes === 'number' && Number.isInteger(item.episodes))) ||
+      typeof item.status !== 'string'
+    ) throw new Error('Elemento de catálogo inválido.');
 
     return {
       id: item.id,
+      source: item.source as ContentSource,
+      sourceAttribution: item.sourceAttribution,
+      externalId: item.externalId,
       title: item.title,
-      category: category as ContentCategory,
+      originalTitle: item.originalTitle,
+      category: item.category as ContentCategory,
       categoryLabel: item.categoryLabel,
       year: item.year,
       score: item.score,
       maturity: item.maturity,
       format: item.format,
-      genres,
-      artwork: artwork as ContentItem['artwork'],
+      genres: item.genres,
+      artwork: item.artwork,
+      studio: item.studio,
+      episodes: item.episodes,
+      status: item.status,
     };
   });
 }
 
-/** Returns one category without mutating the original API result. */
-export function filterContentByCategory(
-  items: readonly ContentItem[],
-  category: ContentCategory,
-): ContentItem[] {
-  return items.filter((item) => item.category === category);
-}
-
-
-/** Validates one detailed catalog record returned by the Python API. */
 export function parseContentDetailResponse(value: unknown): ContentDetail {
-  if (!isRecord(value)) throw new Error('El detalle recibido no es valido.');
-
+  if (!isRecord(value)) throw new Error('El detalle recibido no es válido.');
   const parsed = parseCatalogResponse({ items: [value] })[0];
-  if (!parsed) throw new Error('El detalle recibido no es valido.');
-  if (
-    typeof value.synopsis !== 'string' || value.synopsis.length === 0 || value.synopsis.length > 1200 ||
-    typeof value.origin !== 'string' || value.origin.length === 0 || value.origin.length > 80 ||
-    typeof value.status !== 'string' || value.status.length === 0 || value.status.length > 40
-  ) {
-    throw new Error('El detalle recibido no es valido.');
+  if (!parsed || typeof value.synopsis !== 'string' || typeof value.origin !== 'string') {
+    throw new Error('El detalle recibido no es válido.');
   }
-
   return {
     ...parsed,
     synopsis: value.synopsis,
     origin: value.origin,
-    status: value.status,
+    backdropUrl: allowedHttpsUrl(value.backdropUrl, allowedArtworkHosts) ? value.backdropUrl : null,
+    trailerYoutubeId: typeof value.trailerYoutubeId === 'string' && /^[A-Za-z0-9_-]{6,20}$/.test(value.trailerYoutubeId) ? value.trailerYoutubeId : null,
+    officialUrl: allowedHttpsUrl(value.officialUrl) ? value.officialUrl : null,
+    platformLinks: parsePlatformLinks(value.platformLinks),
+    sourceUrl: allowedHttpsUrl(value.sourceUrl) ? value.sourceUrl : null,
   };
+}
+
+export function filterContentByCategory(items: readonly ContentItem[], category: ContentCategory): ContentItem[] {
+  return items.filter((item) => item.category === category);
 }

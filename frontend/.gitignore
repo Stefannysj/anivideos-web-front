@@ -1,9 +1,43 @@
+# Dependencies
 node_modules/
+
+# Production build
 dist/
-coverage/
-.pnpm-store/
+
+# Vite
+.vite/
+*.local
+
+# Environment variables
 .env
 .env.*
+!.env.example
+
+# Test / coverage
+coverage/
+.nyc_output/
+
+# Logs
 *.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# TypeScript
 *.tsbuildinfo
+
+# IDE
+.vscode/
+.idea/
+
+# OS
 .DS_Store
+Thumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.swp

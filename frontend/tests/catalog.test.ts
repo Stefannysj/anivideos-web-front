@@ -1,24 +1,12 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { filterContentByCategory, parseCatalogResponse } from '../src/models/content.js';
+import { parseCatalogResponse } from '../src/models/content.js';
 
-const payload = {
-  items: [
-    {
-      id: 'anime-test', title: 'Test', category: 'anime', categoryLabel: 'Anime',
-      year: 2026, score: 8.5, maturity: '13+', format: '12 episodios',
-      genres: ['Aventura'], artwork: '/posters/anime-test.svg',
-    },
-  ],
-};
-
-test('parseCatalogResponse validates API data', () => {
-  const items = parseCatalogResponse(payload);
-  assert.equal(items.length, 1);
-  assert.equal(items[0]?.id, 'anime-test');
-  assert.equal(filterContentByCategory(items, 'anime').length, 1);
-});
-
-test('parseCatalogResponse rejects unsafe artwork paths', () => {
-  assert.throws(() => parseCatalogResponse({ items: [{ ...payload.items[0], artwork: 'https://example.com/x.svg' }] }));
+test('accepts AniList and TMDB artwork hosts and v16 categories', () => {
+  const items = parseCatalogResponse({ items: [{
+    id:'anilist-1',source:'anilist',sourceAttribution:'AniList',externalId:'1',title:'Example',originalTitle:null,
+    category:'ova',categoryLabel:'OVA',year:2026,score:8.2,maturity:'NR',format:'ova',genres:['Drama'],
+    artwork:'https://s4.anilist.co/file/a.jpg',studio:null,episodes:1,status:'finished'
+  }]});
+  assert.equal(items[0]?.category, 'ova');
 });

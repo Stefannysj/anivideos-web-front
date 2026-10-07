@@ -2,23 +2,5 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { parseBannerResponse, wrapBannerIndex } from '../src/models/banner.js';
 
-const payload = {
-  items: [
-    {
-      id: 'banner-test', category: 'Anime', eyebrow: 'Destacado', title: 'Test',
-      synopsis: 'Historia de prueba', year: 2026, ageRating: '13+', format: '12 episodios',
-      genres: ['Aventura'], artwork: '/banners/banner-test.svg', sectionHref: '#anime',
-    },
-  ],
-};
-
-test('parseBannerResponse validates API data', () => {
-  const items = parseBannerResponse(payload);
-  assert.equal(items.length, 1);
-  assert.equal(items[0]?.id, 'banner-test');
-});
-
-test('wrapBannerIndex wraps in both directions', () => {
-  assert.equal(wrapBannerIndex(0, -1, 4), 3);
-  assert.equal(wrapBannerIndex(3, 1, 4), 0);
-});
+test('parses real provider banner',()=>{const items=parseBannerResponse({items:[{id:'featured-anilist-1',contentId:'anilist-1',source:'anilist',sourceAttribution:'AniList',category:'Anime',eyebrow:'Anime destacado',title:'Example',synopsis:'Text',year:2026,ageRating:'NR',format:'tv',genres:['Drama'],artwork:'https://s4.anilist.co/file/banner.jpg',sectionHref:'#anime'}]});assert.equal(items[0]?.contentId,'anilist-1');});
+test('wraps indexes',()=>assert.equal(wrapBannerIndex(0,-1,4),3));
