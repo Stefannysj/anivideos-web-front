@@ -50,6 +50,6 @@ test('React source does not opt out of HTML escaping or persist session credenti
 
   assert.equal(source.includes('dangerouslySetInnerHTML'), false);
   assert.equal(source.includes('.innerHTML ='), false);
-  assert.equal(source.includes('localStorage.setItem'), false);
-  assert.equal(source.includes('sessionStorage.setItem'), false);
+  assert.equal(/localStorage\.setItem\([^)]*(token|session|password)/i.test(source), false);
+  assert.equal(/sessionStorage\.setItem/i.test(source), false);
 });

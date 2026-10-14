@@ -15,20 +15,17 @@ type SearchState = { status: 'idle'|'loading'|'ready'|'error'; items: ContentIte
 const categories: Array<{value: CatalogFilters['category']; label: string}> = [
   { value: 'all', label: t('catalog.option.allCategories') },
   { value: 'anime', label: t('category.anime') },
-  { value: 'k-drama', label: t('category.k-drama') },
-  { value: 'j-drama', label: t('category.j-drama') },
-  { value: 'donghua', label: t('category.donghua') },
-  { value: 'movie', label: t('category.movie') },
   { value: 'ova', label: t('category.ova') },
 ];
 
 export function CatalogExplorer({ items }: Props) {
+  const anilistItems = useMemo(() => items.filter((item) => item.source === 'anilist'), [items]);
   const [filters, setFilters] = useState<CatalogFilters>(defaultCatalogFilters);
   const [state, setState] = useState<SearchState>({ status: 'idle', items: [] });
   const [suggestions, setSuggestions] = useState<ContentItem[]>([]);
   const [suggestionsOpen, setSuggestionsOpen] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
-  const options = useMemo(() => getCatalogFilterOptions(items), [items]);
+  const options = useMemo(() => getCatalogFilterOptions(anilistItems), [anilistItems]);
   const active = hasActiveCatalogFilters(filters);
   const baseUrl = useMemo(() => resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL, import.meta.env.PROD), []);
 
@@ -38,7 +35,12 @@ export function CatalogExplorer({ items }: Props) {
     const controller = new AbortController();
     const timeout = window.setTimeout(() => {
       void getSearchSuggestions(baseUrl, query, controller.signal)
-        .then((result) => { if (!controller.signal.aborted) { setSuggestions(result); setSuggestionsOpen(true); } })
+        .then((result) => {
+          if (!controller.signal.aborted) {
+            setSuggestions(result.filter((item) => item.source === 'anilist'));
+            setSuggestionsOpen(true);
+          }
+        })
         .catch(() => { if (!controller.signal.aborted) { setSuggestions([]); setSuggestionsOpen(false); } });
     }, 180);
     return () => { window.clearTimeout(timeout); controller.abort(); };
@@ -50,7 +52,11 @@ export function CatalogExplorer({ items }: Props) {
     const timeout = window.setTimeout(() => {
       setState((current) => ({ status: 'loading', items: current.items }));
       void getCatalog(baseUrl, controller.signal, filters)
-        .then((results) => { if (!controller.signal.aborted) setState({ status: 'ready', items: results }); })
+        .then((results) => {
+          if (!controller.signal.aborted) {
+            setState({ status: 'ready', items: results.filter((item) => item.source === 'anilist') });
+          }
+        })
         .catch(() => { if (!controller.signal.aborted) setState({ status: 'error', items: [] }); });
     }, 280);
     return () => { window.clearTimeout(timeout); controller.abort(); };
@@ -59,8 +65,8 @@ export function CatalogExplorer({ items }: Props) {
   const select = <K extends keyof CatalogFilters>(key: K, value: CatalogFilters[K]) => setFilters((current) => ({ ...current, [key]: value }));
 
   return (
-    <section className="catalog-explorer" id="catalogo" aria-labelledby="catalog-explorer-title">
-      <div className="catalog-explorer__header"><div><p className="eyebrow">{t('catalog.search.eyebrow')}</p><h2 id="catalog-explorer-title">{t('catalog.search.title')}</h2><p>{t('catalog.search.body')}</p></div><span className="catalog-explorer__total">{items.length}</span></div>
+    <section className="catalog-explorer" aria-labelledby="catalog-explorer-title">
+      <div className="catalog-explorer__header"><div><p className="eyebrow">{t('catalog.search.eyebrow')}</p><h2 id="catalog-explorer-title">{t('catalog.search.title')}</h2><p>{t('catalog.search.body')}</p></div><span className="catalog-explorer__total">{anilistItems.length}</span></div>
       <form className="catalog-filters v16-catalog-filters" role="search" onSubmit={(e)=>e.preventDefault()}>
         <div className="v17-search-wrap">
           <div className="catalog-search"><Icon name="search" size={19}/><input type="search" value={filters.query} maxLength={80} autoComplete="off" placeholder={t('catalog.search.placeholder')} onFocus={()=>{ if (suggestions.length) setSuggestionsOpen(true); }} onBlur={()=>window.setTimeout(()=>setSuggestionsOpen(false),120)} onChange={(e)=>select('query', e.target.value)} />{filters.query && <button type="button" className="catalog-search__clear" aria-label={t('catalog.search.clear')} onClick={()=>select('query','')}><Icon name="close" size={16}/></button>}</div>

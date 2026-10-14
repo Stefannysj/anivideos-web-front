@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { resolveApiBaseUrl } from '../config/api.js';
 import { useAuth } from '../context/AuthContext.js';
-import { t } from '../i18n/i18n.js';
+import { formatNumber, t } from '../i18n/i18n.js';
 import type { ReviewItem, ReviewReportReason } from '../models/review.js';
 import { deleteReview, getReviews, reportReview, saveReview } from '../services/review.service.js';
 
@@ -70,8 +70,8 @@ export function ReviewsPanel({ contentId }: Props) {
   return (
     <section className="v17-reviews">
       <div className="v17-reviews__heading">
-        <div><p className="eyebrow">{t('reviews.title')}</p><h2>{average.toFixed(1)} / 10</h2></div>
-        <p>{t('reviews.average')}: {average.toFixed(1)} · {count} {t('reviews.count')}</p>
+        <div><p className="eyebrow">{t('reviews.title')}</p><h2>{formatNumber(average,{minimumFractionDigits:1,maximumFractionDigits:1})} / 10</h2></div>
+        <p>{t('reviews.average')}: {formatNumber(average,{minimumFractionDigits:1,maximumFractionDigits:1})} · {formatNumber(count)} {t('reviews.count')}</p>
       </div>
 
       {authStatus === 'authenticated' ? (

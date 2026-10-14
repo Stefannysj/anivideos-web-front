@@ -1,12 +1,7 @@
 import { useEffect, useState } from 'react';
 import { MarkdownArticle } from '../components/MarkdownArticle.js';
 import { blogArticles } from '../content/blog.js';
-import { t } from '../i18n/i18n.js';
-
-export function BlogArticlePage({ slug }: { slug: string }) {
-  const meta = blogArticles.find((article)=>article.slug===slug);
-  const [body,setBody]=useState<string|null>(null); const [error,setError]=useState(false);
-  useEffect(()=>{ if(!meta){setError(true);return;} const c=new AbortController(); void fetch(`/content/blog/es/${encodeURIComponent(slug)}.md`,{signal:c.signal,credentials:'omit'}).then(r=>{if(!r.ok)throw new Error();return r.text();}).then(setBody).catch(()=>{if(!c.signal.aborted)setError(true);}); return()=>c.abort();},[meta,slug]);
-  if(!meta||error)return <main className="v16-page"><h1>{t('blog.notFound')}</h1><a href="/blog">{t('blog.back')}</a></main>;
-  return <main className="v16-page v16-article"><a href="/blog">← {t('blog.back')}</a><header><p className="eyebrow">{meta.kind} · {meta.date}</p><h1>{t(meta.titleKey)}</h1><p>{t(meta.excerptKey)}</p></header>{body?<MarkdownArticle markdown={body}/>:<p>{t('app.loading')}</p>}</main>;
-}
+import { formatDate, getActiveLocale, t } from '../i18n/i18n.js';
+import { routeHref } from '../i18n/routes.js';
+const kindKey={review:'blog.kind.review',season:'blog.kind.guide',ranking:'blog.kind.ranking',guide:'blog.kind.guide'} as const;
+export function BlogArticlePage({slug}:{slug:string}){const locale=getActiveLocale();const meta=blogArticles.find((article)=>article.slug===slug);const [body,setBody]=useState<string|null>(null);const [error,setError]=useState(false);useEffect(()=>{if(!meta){setError(true);return;}const controller=new AbortController();void fetch(`/content/blog/${locale}/${encodeURIComponent(slug)}.md`,{signal:controller.signal,credentials:'omit'}).then((response)=>{if(!response.ok)throw new Error();return response.text();}).then(setBody).catch(()=>{if(!controller.signal.aborted)setError(true);});return()=>controller.abort();},[locale,meta,slug]);const blogHref=routeHref(locale,{kind:'blog'});if(!meta||error)return <main className="v16-page"><h1>{t('blog.notFound')}</h1><a href={blogHref}>{t('blog.back')}</a></main>;return <main className="v16-page v16-article"><a href={blogHref}>← {t('blog.back')}</a><header><p className="eyebrow">{t(kindKey[meta.kind])} · {formatDate(meta.date)}</p><h1>{t(meta.titleKey)}</h1><p>{t(meta.excerptKey)}</p></header>{body?<MarkdownArticle markdown={body}/>:<p>{t('app.loading')}</p>}</main>;}

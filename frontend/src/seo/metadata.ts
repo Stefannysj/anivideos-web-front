@@ -1,0 +1,3 @@
+import { t } from '../i18n/i18n.js';
+import type { AppRoute } from '../i18n/routes.js';
+export function applyRouteMetadata(route:AppRoute):void{let title=t('meta.home.title');if(route.kind==='blog'||route.kind==='article')title=t('meta.blog.title');else if(route.kind==='calendar')title=t('meta.calendar.title');else if(route.kind==='legal')title=t(route.page==='terms'?'meta.terms.title':route.page==='privacy'?'meta.privacy.title':'meta.dmca.title');document.title=title;let meta=document.querySelector<HTMLMetaElement>('meta[name="description"]');if(!meta){meta=document.createElement('meta');meta.name='description';document.head.append(meta);}meta.content=t('meta.home.description');}

@@ -1,28 +1,18 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { resolveApiBaseUrl } from '../config/api.js';
+import { t } from '../i18n/i18n.js';
 import type { ConnectionState } from '../models/health.js';
 import { getHealth } from '../services/health.service.js';
 
-const labels: Record<ConnectionState['status'], string> = {
-  idle: 'Sin comprobar',
-  checking: 'Comprobando...',
-  available: 'Conexión disponible',
-  unavailable: 'Sin conexión',
-};
-
-/** Verifica manualmente el endpoint de salud sin mantener conexiones ni reintentos en segundo plano. */
 export function ApiStatus() {
   const [state, setState] = useState<ConnectionState>({ status: 'idle' });
   const request = useRef<AbortController | null>(null);
 
-  useEffect(() => () => { request.current?.abort(); }, []);
-
-  async function checkConnection(): Promise<void> {
-    if (request.current) return;
+  const check = useCallback(async () => {
+    request.current?.abort();
     const controller = new AbortController();
     request.current = controller;
     setState({ status: 'checking' });
-
     try {
       const baseUrl = resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL, import.meta.env.PROD);
       const data = await getHealth(baseUrl, controller.signal);
@@ -32,32 +22,23 @@ export function ApiStatus() {
     } finally {
       if (request.current === controller) request.current = null;
     }
-  }
+  }, []);
+
+  useEffect(() => {
+    void check();
+    return () => request.current?.abort();
+  }, [check]);
+
+  const label = state.status === 'idle' ? t('api.idle') : state.status === 'checking' ? t('api.checking') : state.status === 'available' ? t('api.available') : t('api.unavailable');
 
   return (
     <div className="api-status" aria-labelledby="backend-status-title">
-      <div>
-        <p className="eyebrow">API independiente</p>
-        <h3 id="backend-status-title">Backend</h3>
-        <p>Comprueba el endpoint local de salud cuando necesites validar la comunicación.</p>
-      </div>
+      <div><p className="eyebrow">{t('api.eyebrow')}</p><h3 id="backend-status-title">Backend</h3><p>{t('api.description')}</p></div>
       <div className="api-status__controls">
-        <p className={`status status--${state.status}`} role="status" aria-live="polite">
-          <span className="status-dot" aria-hidden="true" />
-          {labels[state.status]}
-        </p>
-        <button
-          className="button button--secondary"
-          type="button"
-          disabled={state.status === 'checking'}
-          onClick={() => { void checkConnection(); }}
-        >
-          {state.status === 'checking' ? 'Comprobando...' : 'Comprobar conexión'}
-        </button>
+        <p className={`status status--${state.status}`} role="status" aria-live="polite"><span className="status-dot" aria-hidden="true" />{label}</p>
+        <button className="button button--secondary" type="button" onClick={() => void check()}>{t('api.check')}</button>
       </div>
-      {state.status === 'unavailable' && (
-        <p className="api-status__help">Verifica que el backend esté iniciado en el puerto 3001.</p>
-      )}
+      {state.status === 'unavailable' && <p className="api-status__help">{t('api.help')}</p>}
     </div>
   );
 }

@@ -1,21 +1,24 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
+import { resolveApiBaseUrl } from '../config/api.js';
+import { useAuth } from '../context/AuthContext.js';
+import { t } from '../i18n/i18n.js';
 import { validateEmail, validatePassword, validateUsername } from '../models/auth.js';
 import { AuthRequestError } from '../services/auth.service.js';
-import { useAuth } from '../context/AuthContext.js';
+import { getHealth } from '../services/health.service.js';
 import { Brand } from './Brand.js';
 import { Icon } from './Icon.js';
 
 export type AuthMode = 'login' | 'register';
+type BackendState = 'checking' | 'available' | 'unavailable';
 
-interface AuthModalProps {
+interface Props {
   mode: AuthMode;
   onModeChange: (mode: AuthMode) => void;
   onClose: () => void;
 }
 
-/** Accessible login/register dialog. The backend owns credentials and the browser only receives an HttpOnly session cookie. */
-export function AuthModal({ mode, onModeChange, onClose }: AuthModalProps) {
+export function AuthModal({ mode, onModeChange, onClose }: Props) {
   const { login, register } = useAuth();
   const [identifier, setIdentifier] = useState('');
   const [username, setUsername] = useState('');
@@ -24,27 +27,36 @@ export function AuthModal({ mode, onModeChange, onClose }: AuthModalProps) {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [backend, setBackend] = useState<BackendState>('checking');
   const firstInput = useRef<HTMLInputElement>(null);
+  const baseUrl = useMemo(() => resolveApiBaseUrl(import.meta.env.VITE_API_BASE_URL, import.meta.env.PROD), []);
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
+    const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     firstInput.current?.focus();
-    function onKeyDown(event: KeyboardEvent): void {
-      if (event.key === 'Escape' && !submitting) onClose();
-    }
-    document.addEventListener('keydown', onKeyDown);
+    function key(event: KeyboardEvent): void { if (event.key === 'Escape' && !submitting) onClose(); }
+    document.addEventListener('keydown', key);
     return () => {
-      document.body.style.overflow = previousOverflow;
-      document.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = previous;
+      document.removeEventListener('keydown', key);
     };
   }, [onClose, submitting]);
 
-  function switchMode(nextMode: AuthMode): void {
+  useEffect(() => {
+    const controller = new AbortController();
+    setBackend('checking');
+    void getHealth(baseUrl, controller.signal)
+      .then(() => { if (!controller.signal.aborted) setBackend('available'); })
+      .catch(() => { if (!controller.signal.aborted) setBackend('unavailable'); });
+    return () => controller.abort();
+  }, [baseUrl]);
+
+  function switchMode(next: AuthMode): void {
     setError(null);
     setPassword('');
     setConfirmPassword('');
-    onModeChange(nextMode);
+    onModeChange(next);
   }
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
@@ -52,101 +64,80 @@ export function AuthModal({ mode, onModeChange, onClose }: AuthModalProps) {
     setError(null);
 
     if (mode === 'register') {
-      const usernameError = validateUsername(username);
-      const emailError = validateEmail(email);
-      const passwordError = validatePassword(password);
-      if (usernameError || emailError || passwordError) {
-        setError(usernameError ?? emailError ?? passwordError);
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError('Las contraseñas no coinciden.');
-        return;
-      }
+      const validation = validateUsername(username) ?? validateEmail(email) ?? validatePassword(password);
+      if (validation) { setError(validation); return; }
+      if (password !== confirmPassword) { setError(t('auth.passwordMismatch')); return; }
     } else if (!identifier.trim() || !password) {
-      setError('Completa tus credenciales.');
+      setError(t('auth.completeCredentials'));
       return;
     }
 
     setSubmitting(true);
     try {
-      if (mode === 'login') {
-        await login({ identifier: identifier.trim(), password });
-      } else {
-        await register({ username: username.trim(), email: email.trim(), password });
-      }
+      if (mode === 'login') await login({ identifier: identifier.trim(), password });
+      else await register({ username: username.trim(), email: email.trim(), password });
       onClose();
     } catch (cause) {
-      setError(cause instanceof AuthRequestError ? cause.message : 'No fue posible completar la solicitud.');
+      setError(cause instanceof AuthRequestError ? cause.message : t('auth.requestFailed'));
+      setBackend('unavailable');
     } finally {
       setSubmitting(false);
     }
   }
 
+  const backendLabel = backend === 'available' ? t('api.available') : backend === 'unavailable' ? t('api.unavailable') : t('api.checking');
+
   return (
-    <div className="auth-modal" role="presentation" onMouseDown={(event) => {
-      if (event.target === event.currentTarget && !submitting) onClose();
-    }}>
-      <section className="auth-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
-        <button className="auth-modal__close" type="button" aria-label="Cerrar" disabled={submitting} onClick={onClose}>
-          <Icon name="close" size={21} />
-        </button>
+    <div className="auth-modal v18-auth-modal" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget && !submitting) onClose(); }}>
+      <section className="auth-modal__dialog v18-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="auth-title">
+        <button className="auth-modal__close" type="button" aria-label={t('auth.close')} disabled={submitting} onClick={onClose}><Icon name="close" size={21} /></button>
 
-        <div className="auth-modal__brand"><Brand compact /></div>
-        <p className="eyebrow">Cuenta AniVideos</p>
-        <h1 id="auth-title">{mode === 'login' ? 'Bienvenido de nuevo' : 'Crea tu cuenta'}</h1>
-        <p className="auth-modal__lead">
-          {mode === 'login'
-            ? 'Ingresa con tu usuario o correo para continuar.'
-            : 'Tu contraseña se protege en el backend y nunca se almacena en texto plano.'}
-        </p>
+        <aside className="v18-auth-visual" aria-hidden="true">
+          <div className="v18-auth-visual__orb" />
+          <Brand compact />
+          <div>
+            <p className="eyebrow">AniVideos</p>
+            <h2>{t('home.overview.title')}</h2>
+            <p>{t('home.overview.body')}</p>
+          </div>
+          <div className="v18-auth-visual__marks"><span>{t('source.anilist')}</span><span>PostgreSQL</span><span>HttpOnly</span></div>
+        </aside>
 
-        <div className="auth-tabs" role="tablist" aria-label="Autenticación">
-          <button className={mode === 'login' ? 'auth-tab auth-tab--active' : 'auth-tab'} type="button" role="tab" aria-selected={mode === 'login'} onClick={() => switchMode('login')}>Ingresar</button>
-          <button className={mode === 'register' ? 'auth-tab auth-tab--active' : 'auth-tab'} type="button" role="tab" aria-selected={mode === 'register'} onClick={() => switchMode('register')}>Registrarme</button>
+        <div className="v18-auth-form-panel">
+          <div className={`v18-backend-chip v18-backend-chip--${backend}`} role="status" aria-live="polite">
+            <span />
+            {backendLabel}
+          </div>
+
+          <p className="eyebrow">{t('auth.account')}</p>
+          <h1 id="auth-title">{mode === 'login' ? t('auth.welcome') : t('auth.create')}</h1>
+          <p className="auth-modal__lead">{mode === 'login' ? t('auth.loginLead') : t('auth.registerLead')}</p>
+
+          <div className="auth-tabs" role="tablist" aria-label={t('auth.tabs')}>
+            <button className={mode === 'login' ? 'auth-tab auth-tab--active' : 'auth-tab'} type="button" role="tab" aria-selected={mode === 'login'} onClick={() => switchMode('login')}>{t('auth.login')}</button>
+            <button className={mode === 'register' ? 'auth-tab auth-tab--active' : 'auth-tab'} type="button" role="tab" aria-selected={mode === 'register'} onClick={() => switchMode('register')}>{t('auth.register')}</button>
+          </div>
+
+          <form className="auth-form" onSubmit={(event) => void submit(event)} noValidate>
+            {mode === 'login' ? (
+              <label className="auth-field"><span>{t('auth.identifier')}</span><input ref={firstInput} value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" maxLength={254} disabled={submitting} /></label>
+            ) : (
+              <>
+                <label className="auth-field"><span>{t('auth.username')}</span><input ref={firstInput} value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" minLength={3} maxLength={30} disabled={submitting} /><small>{t('auth.usernameHelp')}</small></label>
+                <label className="auth-field"><span>{t('auth.email')}</span><input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" maxLength={254} disabled={submitting} /></label>
+              </>
+            )}
+
+            <label className="auth-field"><span>{t('auth.password')}</span><input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'register' ? 10 : undefined} maxLength={128} disabled={submitting} />{mode === 'register' && <small>{t('auth.passwordHelp')}</small>}</label>
+            {mode === 'register' && <label className="auth-field"><span>{t('auth.confirmPassword')}</span><input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={10} maxLength={128} disabled={submitting} /></label>}
+
+            {error && <p className="auth-error" role="alert">{error}</p>}
+            {backend === 'unavailable' && !error && <p className="v18-auth-help">{t('api.help')}</p>}
+
+            <button className="button button--primary auth-submit" type="submit" disabled={submitting}>{submitting ? t('auth.submitBusy') : mode === 'login' ? t('auth.login') : t('auth.register')}</button>
+          </form>
+          <p className="auth-modal__security-note">{t('auth.security')}</p>
         </div>
-
-        <form className="auth-form" onSubmit={(event) => void submit(event)} noValidate>
-          {mode === 'login' ? (
-            <label className="auth-field">
-              <span>Usuario o correo</span>
-              <input ref={firstInput} value={identifier} onChange={(event) => setIdentifier(event.target.value)} autoComplete="username" maxLength={254} disabled={submitting} />
-            </label>
-          ) : (
-            <>
-              <label className="auth-field">
-                <span>Usuario</span>
-                <input ref={firstInput} value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" minLength={3} maxLength={30} disabled={submitting} />
-                <small>3-30 caracteres. Letras, números, punto, guion o guion bajo.</small>
-              </label>
-              <label className="auth-field">
-                <span>Correo electrónico</span>
-                <input type="email" value={email} onChange={(event) => setEmail(event.target.value)} autoComplete="email" maxLength={254} disabled={submitting} />
-              </label>
-            </>
-          )}
-
-          <label className="auth-field">
-            <span>Contraseña</span>
-            <input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete={mode === 'login' ? 'current-password' : 'new-password'} minLength={mode === 'register' ? 10 : undefined} maxLength={128} disabled={submitting} />
-            {mode === 'register' && <small>Mínimo 10 caracteres, con al menos una letra y un número.</small>}
-          </label>
-
-          {mode === 'register' && (
-            <label className="auth-field">
-              <span>Confirmar contraseña</span>
-              <input type="password" value={confirmPassword} onChange={(event) => setConfirmPassword(event.target.value)} autoComplete="new-password" minLength={10} maxLength={128} disabled={submitting} />
-            </label>
-          )}
-
-          {error && <div className="auth-error" role="alert">{error}</div>}
-
-          <button className="button button--primary auth-submit" type="submit" disabled={submitting}>
-            {submitting ? 'Procesando...' : mode === 'login' ? 'Ingresar' : 'Crear cuenta'}
-          </button>
-        </form>
-
-        <p className="auth-modal__security-note">Sesión mediante cookie HttpOnly y protección CSRF. AniVideos no guarda el token de sesión en localStorage.</p>
       </section>
     </div>
   );

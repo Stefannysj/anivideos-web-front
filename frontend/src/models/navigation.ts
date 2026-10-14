@@ -1,16 +1,14 @@
-import { t } from '../i18n/i18n.js';
+import type { TranslationKey } from '../i18n/translations.js';
 
 export interface NavigationItem {
-  label: string;
+  labelKey: TranslationKey;
   href: `#${string}`;
 }
 
+/** AniList-only navigation. TMDB-dependent sections are intentionally hidden. */
 export const navigationItems = [
-  { label: t('nav.home'), href: '#inicio' },
-  { label: t('category.anime'), href: '#anime' },
-  { label: t('category.k-drama'), href: '#k-dramas' },
-  { label: t('category.j-drama'), href: '#j-dramas' },
-  { label: t('category.donghua'), href: '#donghua' },
-  { label: t('category.movie'), href: '#peliculas' },
-  { label: t('category.ova'), href: '#ovas' },
+  { labelKey: 'nav.home', href: '#inicio' },
+  { labelKey: 'nav.catalog', href: '#catalogo' },
+  { labelKey: 'category.anime', href: '#anime' },
+  { labelKey: 'category.ova', href: '#ovas' },
 ] as const satisfies readonly NavigationItem[];

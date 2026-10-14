@@ -18,10 +18,10 @@ test('large interaction-only UI is code-split with lazy imports', () => {
   const navbar = readFileSync(new URL('../src/components/Navbar.tsx', import.meta.url), 'utf8');
   const carousel = readFileSync(new URL('../src/components/FeaturedCarousel.tsx', import.meta.url), 'utf8');
 
-  assert.match(app, /lazy\(async \(\) =>[\s\S]*?ContentDetailPage/);
-  assert.match(navbar, /lazy\(async \(\) =>[\s\S]*?AuthModal/);
-  assert.match(navbar, /lazy\(async \(\) =>[\s\S]*?ProfileModal/);
-  assert.match(carousel, /lazy\(async \(\) =>[\s\S]*?BannerCommentsModal/);
+  assert.match(app, /lazy\(async\s*\(\)\s*=>[\s\S]*?ContentDetailPage/);
+  assert.match(navbar, /lazy\(async\s*\(\)\s*=>[\s\S]*?AuthModal/);
+  assert.match(navbar, /lazy\(async\s*\(\)\s*=>[\s\S]*?ProfileModal/);
+  assert.match(carousel, /lazy\(async\s*\(\)\s*=>[\s\S]*?BannerCommentsModal/);
 });
 
 test('below-the-fold sections opt into content visibility', () => {
